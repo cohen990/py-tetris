@@ -3,7 +3,7 @@
 
 from random import randrange as rand
 import pygame, sys
-import state_evaluator as se
+import engine
 
 # The configuration
 cell_size =	18
@@ -83,7 +83,7 @@ class TetrisApp(object):
 		self.stone_x = int(cols / 2 - len(self.stone[0])/2)
 		self.stone_y = 0
 		
-		if se.check_collision(self.board,
+		if engine.check_collision(self.board,
 		                   self.stone,
 		                   (self.stone_x, self.stone_y)):
 			self.gameover = True
@@ -154,7 +154,7 @@ class TetrisApp(object):
 				new_x = 0
 			if new_x > cols - len(self.stone[0]):
 				new_x = cols - len(self.stone[0])
-			if not se.check_collision(self.board,
+			if not engine.check_collision(self.board,
 			                       self.stone,
 			                       (new_x, self.stone_y)):
 				self.stone_x = new_x
@@ -167,10 +167,10 @@ class TetrisApp(object):
 		if not self.gameover and not self.paused:
 			self.score += 1 if manual else 0
 			self.stone_y += 1
-			if se.check_collision(self.board,
+			if engine.check_collision(self.board,
 			                   self.stone,
 			                   (self.stone_x, self.stone_y)):
-				self.board = join_matrixes(
+				self.board = engine.join_matrixes(
 				  self.board,
 				  self.stone,
 				  (self.stone_x, self.stone_y))
@@ -179,7 +179,7 @@ class TetrisApp(object):
 				while True:
 					for i, row in enumerate(self.board[:-1]):
 						if 0 not in row:
-							self.board = se.remove_row(
+							self.board = engine.remove_row(
 							  self.board, i)
 							cleared_rows += 1
 							break
@@ -197,7 +197,7 @@ class TetrisApp(object):
 	def rotate_stone(self):
 		if not self.gameover and not self.paused:
 			new_stone = rotate_clockwise(self.stone)
-			if not se.check_collision(self.board,
+			if not engine.check_collision(self.board,
 			                       new_stone,
 			                       (self.stone_x, self.stone_y)):
 				self.stone = new_stone
