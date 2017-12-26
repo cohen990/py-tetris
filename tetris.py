@@ -170,10 +170,10 @@ class TetrisApp(object):
 			if engine.check_collision(self.board,
 			                   self.stone,
 			                   (self.stone_x, self.stone_y)):
-				self.board = engine.join_matrixes(
+				self.board = engine.join_matrices(
 				  self.board,
 				  self.stone,
-				  (self.stone_x, self.stone_y))
+				  (self.stone_x, self.stone_yo))
 				self.new_stone()
 				cleared_rows, self.board = engine.remove_rows(self.board)
 				self.add_cl_lines(cleared_rows)
