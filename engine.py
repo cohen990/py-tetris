@@ -18,7 +18,7 @@ def remove_row(board, row):
 	return [[0 for i in range(cols)]] + board
 
 
-def join_matrixes(mat1, mat2, mat2_off): 
+def join_matrices(mat1, mat2, mat2_off): 
 	off_x, off_y = mat2_off 
 	for cy, row in enumerate(mat2): 
 		for cx, val in enumerate(row): 
