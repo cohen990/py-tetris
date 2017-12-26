@@ -175,16 +175,7 @@ class TetrisApp(object):
 				  self.stone,
 				  (self.stone_x, self.stone_y))
 				self.new_stone()
-				cleared_rows = 0
-				while True:
-					for i, row in enumerate(self.board[:-1]):
-						if 0 not in row:
-							self.board = engine.remove_row(
-							  self.board, i)
-							cleared_rows += 1
-							break
-					else:
-						break
+				cleared_rows, self.board = engine.remove_rows(self.board)
 				self.add_cl_lines(cleared_rows)
 				return True
 		return False
