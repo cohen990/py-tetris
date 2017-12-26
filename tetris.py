@@ -1,46 +1,9 @@
 #!/usr/bin/env python2
 #-*- coding: utf-8 -*-
 
-# NOTE FOR WINDOWS USERS:
-# You can download a "exefied" version of this game at:
-# http://hi-im.laria.me/progs/tetris_py_exefied.zip
-# If a DLL is missing or something like this, write an E-Mail (me@laria.me)
-# or leave a comment on this gist.
-
-# Very simple tetris implementation
-# 
-# Control keys:
-#       Down - Drop stone faster
-# Left/Right - Move stone
-#         Up - Rotate Stone clockwise
-#     Escape - Quit game
-#          P - Pause game
-#     Return - Instant drop
-#
-# Have fun!
-
-# Copyright (c) 2010 "Laria Carolin Chabowski"<me@laria.me>
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-
 from random import randrange as rand
 import pygame, sys
+import state_evaluator as se
 
 # The configuration
 cell_size =	18
@@ -88,28 +51,6 @@ def rotate_clockwise(shape):
 			for y in range(len(shape)) ]
 		for x in range(len(shape[0]) - 1, -1, -1) ]
 
-def check_collision(board, shape, offset):
-	off_x, off_y = offset
-	for cy, row in enumerate(shape):
-		for cx, cell in enumerate(row):
-			try:
-				if cell and board[ cy + off_y ][ cx + off_x ]:
-					return True
-			except IndexError:
-				return True
-	return False
-
-def remove_row(board, row):
-	del board[row]
-	return [[0 for i in range(cols)]] + board
-	
-def join_matrixes(mat1, mat2, mat2_off):
-	off_x, off_y = mat2_off
-	for cy, row in enumerate(mat2):
-		for cx, val in enumerate(row):
-			mat1[cy+off_y-1	][cx+off_x] += val
-	return mat1
-
 def new_board():
 	board = [ [ 0 for x in range(cols) ]
 			for y in range(rows) ]
@@ -142,7 +83,7 @@ class TetrisApp(object):
 		self.stone_x = int(cols / 2 - len(self.stone[0])/2)
 		self.stone_y = 0
 		
-		if check_collision(self.board,
+		if se.check_collision(self.board,
 		                   self.stone,
 		                   (self.stone_x, self.stone_y)):
 			self.gameover = True
@@ -213,7 +154,7 @@ class TetrisApp(object):
 				new_x = 0
 			if new_x > cols - len(self.stone[0]):
 				new_x = cols - len(self.stone[0])
-			if not check_collision(self.board,
+			if not se.check_collision(self.board,
 			                       self.stone,
 			                       (new_x, self.stone_y)):
 				self.stone_x = new_x
@@ -226,7 +167,7 @@ class TetrisApp(object):
 		if not self.gameover and not self.paused:
 			self.score += 1 if manual else 0
 			self.stone_y += 1
-			if check_collision(self.board,
+			if se.check_collision(self.board,
 			                   self.stone,
 			                   (self.stone_x, self.stone_y)):
 				self.board = join_matrixes(
@@ -238,7 +179,7 @@ class TetrisApp(object):
 				while True:
 					for i, row in enumerate(self.board[:-1]):
 						if 0 not in row:
-							self.board = remove_row(
+							self.board = se.remove_row(
 							  self.board, i)
 							cleared_rows += 1
 							break
@@ -256,7 +197,7 @@ class TetrisApp(object):
 	def rotate_stone(self):
 		if not self.gameover and not self.paused:
 			new_stone = rotate_clockwise(self.stone)
-			if not check_collision(self.board,
+			if not se.check_collision(self.board,
 			                       new_stone,
 			                       (self.stone_x, self.stone_y)):
 				self.stone = new_stone
