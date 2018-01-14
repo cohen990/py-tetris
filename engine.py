@@ -1,6 +1,40 @@
 #!/usr/bin/env python2
 #-*- coding: utf-8 -*-
 
+from random import randrange as rand
+
+tetris_shapes = [
+	[[1, 1, 1],
+	 [0, 1, 0]],
+	
+	[[0, 2, 2],
+	 [2, 2, 0]],
+	
+	[[3, 3, 0],
+	 [0, 3, 3]],
+	
+	[[4, 0, 0],
+	 [4, 4, 4]],
+	
+	[[0, 0, 5],
+	 [5, 5, 5]],
+	
+	[[6, 6, 6, 6]],
+	
+	[[7, 7],
+	 [7, 7]]
+]
+
+def get_new_piece():
+    return tetris_shapes[rand(len(tetris_shapes))]
+
+def new_board(width, height):
+	board = [ [ 0 for x in range(width) ]
+			for y in range(height) ]
+	board += [[ 1 for x in range(width)]]
+	return board
+
+
 def check_collision(board, shape, offset):
 	off_x, off_y = offset
 	for cy, row in enumerate(shape):

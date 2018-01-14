@@ -1,7 +1,10 @@
+import engine
 # scaffold for what it should look like
+board_width = 10
+board_height = 20
 
-# fn choose_move:
-    # engine.get_board
+def choose_move():
+    engine.get_board(board_width, board_height) 
     # engine.get_current_piece
 
     # search_tree = new search_tree()
@@ -23,12 +26,12 @@
 #   cnn_input = board.flatten
 #   cnn.evaluate(cnn_input)
 
-# def main():
-#   while(true):
-    #   game = engine.start_game()
+def main():
+    while(true):
+       board = engine.new_board()
     #   while(game.not_over):
-    #       move, value = choose_move()
+           move, value = choose_move()
     #       historical_evaluations.push((move, value))
-    #       game = engine.play(move)
+           game = engine.play(move)
     #   cnn.train(game.score, historical_evaluations)
 

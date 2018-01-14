@@ -23,39 +23,10 @@ colors = [
 (35,  35,  35) # Helper color for background grid
 ]
 
-# Define the shapes of the single parts
-tetris_shapes = [
-	[[1, 1, 1],
-	 [0, 1, 0]],
-	
-	[[0, 2, 2],
-	 [2, 2, 0]],
-	
-	[[3, 3, 0],
-	 [0, 3, 3]],
-	
-	[[4, 0, 0],
-	 [4, 4, 4]],
-	
-	[[0, 0, 5],
-	 [5, 5, 5]],
-	
-	[[6, 6, 6, 6]],
-	
-	[[7, 7],
-	 [7, 7]]
-]
-
 def rotate_clockwise(shape):
 	return [ [ shape[y][x]
 			for y in range(len(shape)) ]
 		for x in range(len(shape[0]) - 1, -1, -1) ]
-
-def new_board():
-	board = [ [ 0 for x in range(cols) ]
-			for y in range(rows) ]
-	board += [[ 1 for x in range(cols)]]
-	return board
 
 class TetrisApp(object):
 	def __init__(self):
@@ -74,12 +45,12 @@ class TetrisApp(object):
 		                                             # mouse movement
 		                                             # events, so we
 		                                             # block them.
-		self.next_stone = tetris_shapes[rand(len(tetris_shapes))]
+		self.next_stone = engine.get_new_piece()
 		self.init_game()
 	
 	def new_stone(self):
 		self.stone = self.next_stone[:]
-		self.next_stone = tetris_shapes[rand(len(tetris_shapes))]
+		self.next_stone = engine.get_new_piece()
 		self.stone_x = int(cols / 2 - len(self.stone[0])/2)
 		self.stone_y = 0
 		
@@ -89,7 +60,7 @@ class TetrisApp(object):
 			self.gameover = True
 	
 	def init_game(self):
-		self.board = new_board()
+		self.board = engine.new_board(cols, rows)
 		self.new_stone()
 		self.level = 1
 		self.score = 0
@@ -173,7 +144,7 @@ class TetrisApp(object):
 				self.board = engine.join_matrices(
 				  self.board,
 				  self.stone,
-				  (self.stone_x, self.stone_yo))
+				  (self.stone_x, self.stone_y))
 				self.new_stone()
 				cleared_rows, self.board = engine.remove_rows(self.board)
 				self.add_cl_lines(cleared_rows)
