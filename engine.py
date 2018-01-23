@@ -28,11 +28,11 @@ tetris_shapes = [
 def get_new_piece():
     return tetris_shapes[rand(len(tetris_shapes))]
 
-def new_board(width, height):
+def new_game(width, height):
 	board = [ [ 0 for x in range(width) ]
 			for y in range(height) ]
 	board += [[ 1 for x in range(width)]]
-	return board
+	return board, get_new_piece()
 
 
 def check_collision(board, shape, offset):
@@ -70,4 +70,6 @@ def remove_rows(board):
 				break
 		else:
 			return cleared_rows, board
-			
+def play(move, board):
+    return board, get_new_piece()
+
