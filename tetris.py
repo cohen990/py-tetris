@@ -32,8 +32,7 @@ def rotate_clockwise(shape):
 
 class TetrisApp(object):
     def __init__(self):
-        print(ui.Ui)
-        Ui.initialise_pygame(self)
+        Ui.initialise(self)
         self.width = cell_size*(cols+6)
         self.height = cell_size*rows
         self.rlim = cell_size*cols

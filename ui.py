@@ -4,7 +4,7 @@ class Ui(object):
     def get_screen(width, height):
         return (pygame.display.set_mode((width, height)))
 
-    def initialise_pygame(target):
+    def initialise(target):
         pygame.init()
         pygame.key.set_repeat(250,25)
         target.default_font =  pygame.font.Font(
