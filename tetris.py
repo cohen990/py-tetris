@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 
 from random import randrange as rand
-import pygame, sys
+import sys
 import engine
 import ui
 from ui import Ui
@@ -198,14 +198,13 @@ Press space to continue""" % self.score)
             Ui.update() 
 
             for event in Ui.get_events():
-                if event.type == pygame.USEREVENT+1:
+                if Ui.is_user_event(event):
                     self.drop(False)
-                elif event.type == pygame.QUIT:
+                elif Ui.is_quit_event(event):
                     self.quit()
-                elif event.type == pygame.KEYDOWN:
+                elif Ui.is_keydown_event(event):
                     for key in key_actions:
-                        if event.key == eval("pygame.K_"
-                        +key):
+                        if Ui.is_correct_key(event, key):
                             key_actions[key]()
                     
             dont_burn_my_cpu.tick(maxfps)

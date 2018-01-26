@@ -41,3 +41,14 @@ class Ui(object):
     def get_events():
         return pygame.event.get()
 
+    def is_user_event(event):
+        return event.type == pygame.USEREVENT+1
+
+    def is_quit_event(event):
+        return event.type == pygame.QUIT
+
+    def is_keydown_event(event):
+        return event.type == pygame.KEYDOWN
+
+    def is_correct_key(event, key):
+        return event.key == eval("pygame.K_" +key)
