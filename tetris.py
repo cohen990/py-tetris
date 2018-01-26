@@ -4,6 +4,7 @@
 from random import randrange as rand
 import pygame, sys
 import engine
+import ui
 
 # The configuration
 cell_size =    18
@@ -28,27 +29,55 @@ def rotate_clockwise(shape):
             for y in range(len(shape)) ]
         for x in range(len(shape[0]) - 1, -1, -1) ]
 
-def get_screen(width, height):
-    return (pygame.display.set_mode((width, height)))
+class Ui(object):
+    def get_screen(width, height):
+        return (pygame.display.set_mode((width, height)))
 
+    def initialise_pygame(target):
+        pygame.init()
+        pygame.key.set_repeat(250,25)
+        target.default_font =  pygame.font.Font(
+            pygame.font.get_default_font(), 12)
+        pygame.event.set_blocked(pygame.MOUSEMOTION)
+
+    def set_timer(timeout):
+        pygame.time.set_timer(pygame.USEREVENT+1, timeout)
+
+    def draw(screen, color, x_pos, y_pos, cell_size):
+        pygame.draw.rect(
+            screen,
+            color,
+            pygame.Rect(
+                (x_pos) *
+                  cell_size,
+                (y_pos) *
+                  cell_size, 
+                cell_size,
+                cell_size),0)
+
+    def update():
+        pygame.display.update()
+
+    def get_clock():
+        return pygame.time.Clock()
+
+    def draw_line(screen, rlim, height):
+        pygame.draw.line(screen,
+            (255,255,255),
+            (rlim+1, 0),
+            (rlim+1, height-1))
+
+    def get_events():
+        return pygame.event.get()
 
 class TetrisApp(object):
     def __init__(self):
-        pygame.init()
-        pygame.key.set_repeat(250,25)
+        Ui.initialise_pygame(self)
         self.width = cell_size*(cols+6)
         self.height = cell_size*rows
         self.rlim = cell_size*cols
         self.bground_grid = [[ 8 if x%2==y%2 else 0 for x in range(cols)] for y in range(rows)]
-        
-        self.default_font =  pygame.font.Font(
-            pygame.font.get_default_font(), 12)
-        
-        self.screen = get_screen(self.width, self.height)
-        pygame.event.set_blocked(pygame.MOUSEMOTION) # We do not need
-                                                     # mouse movement
-                                                     # events, so we
-                                                     # block them.
+        self.screen = Ui.get_screen(self.width, self.height)
         self.next_stone = engine.get_new_piece()
         self.init_game()
     
@@ -69,7 +98,7 @@ class TetrisApp(object):
         self.level = 1
         self.score = 0
         self.lines = 0
-        pygame.time.set_timer(pygame.USEREVENT+1, 1000)
+        Ui.set_timer(1000)
     
     def disp_msg(self, msg, topleft):
         x,y = topleft
@@ -101,16 +130,7 @@ class TetrisApp(object):
         for y, row in enumerate(matrix):
             for x, val in enumerate(row):
                 if val:
-                    pygame.draw.rect(
-                        self.screen,
-                        colors[val],
-                        pygame.Rect(
-                            (off_x+x) *
-                              cell_size,
-                            (off_y+y) *
-                              cell_size, 
-                            cell_size,
-                            cell_size),0)
+                    Ui.draw(self.screen, colors[val], off_x + x, off_y + y, cell_size)
     
     def add_cl_lines(self, n):
         linescores = [0, 40, 100, 300, 1200]
@@ -120,7 +140,7 @@ class TetrisApp(object):
             self.level += 1
             newdelay = 1000-50*(self.level-1)
             newdelay = 100 if newdelay < 100 else newdelay
-            pygame.time.set_timer(pygame.USEREVENT+1, newdelay)
+            Ui.set_timer(newdelay)
     
     def move(self, delta_x):
         if not self.gameover and not self.paused:
@@ -135,7 +155,7 @@ class TetrisApp(object):
                 self.stone_x = new_x
     def quit(self):
         self.center_msg("Exiting...")
-        pygame.display.update()
+        Ui.update()
         sys.exit()
     
     def drop(self, manual):
@@ -191,7 +211,7 @@ class TetrisApp(object):
         self.gameover = False
         self.paused = False
         
-        dont_burn_my_cpu = pygame.time.Clock()
+        dont_burn_my_cpu = Ui.get_clock()
         while 1:
             self.screen.fill((0,0,0))
             if self.gameover:
@@ -201,10 +221,7 @@ Press space to continue""" % self.score)
                 if self.paused:
                     self.center_msg("Paused")
                 else:
-                    pygame.draw.line(self.screen,
-                        (255,255,255),
-                        (self.rlim+1, 0),
-                        (self.rlim+1, self.height-1))
+                    Ui.draw_line(self.screen, self.rlim+1, self.height-1)
                     self.disp_msg("Next:", (
                         self.rlim+cell_size,
                         2))
@@ -217,9 +234,9 @@ Press space to continue""" % self.score)
                         (self.stone_x, self.stone_y))
                     self.draw_matrix(self.next_stone,
                         (cols+1,2))
-            pygame.display.update()
-            
-            for event in pygame.event.get():
+            Ui.update() 
+
+            for event in Ui.get_events():
                 if event.type == pygame.USEREVENT+1:
                     self.drop(False)
                 elif event.type == pygame.QUIT:
