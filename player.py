@@ -45,6 +45,7 @@ def main():
         game, piece = engine.new_game(board_width, board_height)
         game_over = False
         while(not game_over):
+            points = 0
             print("MOVE NUMBER ", move_number)
             command_line_output.print_piece(piece)
             command_line_output.print_game("game", game)
@@ -54,7 +55,10 @@ def main():
                 continue
             # historical_evaluations.push((move, value))
             print("move = ", move)
-            game, piece = engine.play(move, game)
+            points_gained, game, piece = engine.play(move, game)
+            points += points_gained
+            if points_gained > 0:
+                print("gained " + str(points_gained) + " point[s]!")
       #      sys.exit()
             input("hit enter for next move...")
       #      sys.exit()
