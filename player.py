@@ -46,17 +46,18 @@ def main():
         game_over = False
         while(not game_over):
             print("MOVE NUMBER ", move_number)
+            command_line_output.print_piece(piece)
+            command_line_output.print_game("game", game)
             move, value = choose_move(game, piece)
             if(move == None):
                 game_over = True
                 continue
             # historical_evaluations.push((move, value))
             print("move = ", move)
-            command_line_output.print_piece(move[2])
-            command_line_output.print_game(game)
             game, piece = engine.play(move, game)
       #      sys.exit()
-            input("hit enter for next move...")
+      #      input("hit enter for next move...")
+      #      sys.exit()
             move_number += 1
         # cnn.train(game.score, historical_evaluations)
         iteration += 1

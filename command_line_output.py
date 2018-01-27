@@ -1,12 +1,13 @@
 line = "========================================"
 block = '<>'
 
-def print_game(game):
+def print_game(name, game):
     game_as_string = line + '\n'
     for row in game:
         game_as_string += convert_array_to_blocks(row) + '\n'
     game_as_string += line
-    print("game = \n", game_as_string)
+    message = name + " = \n"
+    print(message, game_as_string)
 
 def print_piece(piece):
     piece_as_string = ""
