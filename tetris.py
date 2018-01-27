@@ -44,8 +44,9 @@ class TetrisApp(object):
     def new_stone(self):
         self.stone = self.next_stone[:]
         self.next_stone = engine.get_new_piece()
-        self.stone_x = int(cols / 2 - len(self.stone[0])/2)
-        self.stone_y = 0
+        x, y = engine.get_origin(self.stone, cols)
+        self.stone_x = x
+        self.stone_y = y
         
         if engine.check_collision(self.board,
                            self.stone,

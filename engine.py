@@ -25,6 +25,11 @@ tetris_shapes = [
      [1, 1]]
 ]
 
+def get_origin(piece, columns):
+    x = int(columns / 2 - len(piece[0])/2)
+    y = 0
+    return x, y
+
 def get_new_piece():
     return tetris_shapes[rand(len(tetris_shapes))]
 
@@ -76,8 +81,11 @@ def play(move, board, piece):
     return board, get_new_piece()
 
 def move_is_legal(game_board, piece, position):
+    is_legal = not piece_has_collided(game_board, piece, position) and piece_is_resting(game_board, piece, position) and has_valid_path(game_board, piece, position, get_origin(piece))
+    return is_legal
+
+def piece_has_collided(game_board, piece, position):
     position_x, position_y = position 
-    is_resting = False
     for y, row in enumerate(piece): 
         for x, val in enumerate(row): 
             combined_y = y + position_y - 1
@@ -87,11 +95,23 @@ def move_is_legal(game_board, piece, position):
             print("game_board.y = ", len(game_board))
             print("combined_y = ", combined_y)
             if(len(game_board) - 1 <= combined_y):
-                return False
+                return True
             if(len(game_board[0]) - 1 < combined_x):
-                return False
+                return True
             if(game_board[combined_y][combined_x] + val > 1):
-                return False
+                return True
+    return False
+
+def piece_is_resting(game_board, piece, position):
+    position_x, position_y = position 
+    is_resting = False
+    for y, row in enumerate(piece): 
+        for x, val in enumerate(row): 
+            combined_y = y + position_y - 1
+            combined_x = x + position_x
             if(val == 1 and game_board[combined_y + 1][combined_x] == 1):
                 is_resting = True
     return is_resting
+
+def has_valid_path(game_board, piece, position, origin):
+    return True

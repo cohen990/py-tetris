@@ -3,8 +3,7 @@ from random import randint
 # scaffold for what it should look like
 board_width = 10
 board_height = 20
-line = "=============================="
-
+line = "========================================"
 def choose_move(game, piece):
     search_tree = []
     for x, row in enumerate(game):
