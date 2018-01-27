@@ -1,15 +1,20 @@
 import engine
+import command_line_output
+import sys
 from random import randint
 # scaffold for what it should look like
 board_width = 10
 board_height = 20
-line = "========================================"
 def choose_move(game, piece):
+    rotations = [0, 1, 2, 3]
     search_tree = []
-    for x, row in enumerate(game):
-        for y, item in enumerate(row):
-            if(engine.move_is_legal(game, piece, (y, x))):
-                search_tree.append((y, x))
+    for y_coordinate, row in enumerate(game):
+        for x_coordinate, item in enumerate(row):
+            for rotation in rotations:
+                rotated_piece = engine.rotate(piece, rotation)
+                candidate = x_coordinate, y_coordinate, rotated_piece
+                if(engine.move_is_legal(game, candidate)):
+                    search_tree.append(candidate)
     # for position on board:
     #    if engine.is_legal_move(board, piece, position):
     #        search_tree.add(position)
@@ -47,19 +52,13 @@ def main():
                 continue
             # historical_evaluations.push((move, value))
             print("move = ", move)
-            print("game = \n", game_to_string(game))
-            print("piece = ", piece)
-            game, piece = engine.play(move, game, piece)
+            command_line_output.print_piece(move[2])
+            command_line_output.print_game(game)
+            game, piece = engine.play(move, game)
+      #      sys.exit()
             input("hit enter for next move...")
             move_number += 1
         # cnn.train(game.score, historical_evaluations)
         iteration += 1
-
-def game_to_string(game):
-    result = line + '\n'
-    for row in game:
-        result += str(row).replace('0', '  ').replace(',', ' ').replace('1', '<>') + '\n'
-    result += line
-    return result
 
 main() 

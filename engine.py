@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 #-*- coding: utf-8 -*-
 
+import pathfinder
 from random import randrange as rand
 
 tetris_shapes = [
@@ -76,12 +77,25 @@ def remove_rows(board):
         else:
             return cleared_rows, board
 
-def play(move, board, piece):
-    board = join_matrices(board, piece, move) 
+def rotate(shape, number_of_clockwise_rotations):
+    for i in range(number_of_clockwise_rotations):
+        shape = rotate_clockwise(shape)
+    return shape
+
+def rotate_clockwise(shape):
+    return [ [ shape[y][x]
+            for y in range(len(shape)) ]
+        for x in range(len(shape[0]) - 1, -1, -1) ]
+
+def play(move, board):
+    x, y, piece = move
+    board = join_matrices(board, piece, (x, y)) 
     return board, get_new_piece()
 
-def move_is_legal(game_board, piece, position):
-    is_legal = not piece_has_collided(game_board, piece, position) and piece_is_resting(game_board, piece, position) and has_valid_path(game_board, piece, position, get_origin(piece))
+def move_is_legal(game_board, candidate):
+    x_coordinate, y_coordinate, piece = candidate
+    position = (x_coordinate, y_coordinate)
+    is_legal = not piece_has_collided(game_board, piece, position) and piece_is_resting(game_board, piece, position) and has_valid_path(game_board, piece, candidate, get_origin(piece, len(game_board[0])))
     return is_legal
 
 def piece_has_collided(game_board, piece, position):
@@ -90,10 +104,8 @@ def piece_has_collided(game_board, piece, position):
         for x, val in enumerate(row): 
             combined_y = y + position_y - 1
             combined_x = x + position_x
-            print("game_board.x = ", len(game_board[0]))
-            print("combined_x = ", combined_x)
-            print("game_board.y = ", len(game_board))
-            print("combined_y = ", combined_y)
+            if(combined_x < 0):
+                return True
             if(len(game_board) - 1 <= combined_y):
                 return True
             if(len(game_board[0]) - 1 < combined_x):
@@ -113,5 +125,5 @@ def piece_is_resting(game_board, piece, position):
                 is_resting = True
     return is_resting
 
-def has_valid_path(game_board, piece, position, origin):
-    return True
+def has_valid_path(game_board, piece, candidate, origin):
+    return pathfinder.has_path(game_board, piece, origin, candidate)
