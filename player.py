@@ -26,7 +26,7 @@ def choose_move(game, piece):
     #   if best_value < value:
     #       best_value = value
     #       best_move = move
-    print("search_tree = ", search_tree)
+    print("search_tree size = ", len(search_tree))
     if(len(search_tree) == 0):
         return None, None
     best_move = search_tree[randint(0, len(search_tree) - 1)]
@@ -56,7 +56,7 @@ def main():
             print("move = ", move)
             game, piece = engine.play(move, game)
       #      sys.exit()
-      #      input("hit enter for next move...")
+            input("hit enter for next move...")
       #      sys.exit()
             move_number += 1
         # cnn.train(game.score, historical_evaluations)

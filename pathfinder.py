@@ -1,5 +1,6 @@
 import engine
 from enum import Enum
+from copy import deepcopy
 
 class Move(Enum):
     LEFT = 1
@@ -11,33 +12,45 @@ class Move(Enum):
 valid_moves = [Move.LEFT, Move.RIGHT, Move.DOWN, Move.ROTATE_COUNTERCLOCKWISE, Move.ROTATE_CLOCKWISE]
 
 def has_path(game_board, piece, position, target):
-    has_path = has_path_recursive(game_board, piece, position, target, None)
+    has_path, _ = has_path_recursive(game_board, piece, position, target, None, [])
     return has_path
 
-def has_path_recursive(game_board, piece, position, target, last_move):
+def has_path_recursive(game_board, piece, position, target, last_move, attempted_moves):
+    move = get_move(piece, position)
+
+    if move in attempted_moves:
+        return False, attempted_moves
+    attempted_moves.append(move)
+
     target_x, target_y, target_piece = target
     if piece == target_piece and position == (target_x, target_y):
-        return True
+        return True, attempted_moves
     
     has_found_path = False
     for move in valid_moves:
         if not move == get_opposite(last_move):
+            new_position = deepcopy(position)
+            new_piece = deepcopy(piece)
             if move == Move.LEFT:
-                position = move_left(position)
+                new_position = move_left(position)
             if move == Move.RIGHT:
-                position = move_right(position)
+                new_position = move_right(position)
             if move == Move.DOWN:
-                position = move_down(position)
+                new_position = move_down(position)
             if move == Move.ROTATE_COUNTERCLOCKWISE:
-                piece = engine.rotate(piece, 3)
+                new_piece = engine.rotate(piece, 3)
             if move == Move.ROTATE_CLOCKWISE:
-                piece = engine.rotate(piece, 1)
-            if not engine.piece_has_collided(game_board, piece, position):
-                has_found_path = has_path_recursive(game_board, piece, position, target, move)
+                new_piece = engine.rotate(piece, 1)
+            if not engine.piece_has_collided(game_board, new_piece, new_position):
+                has_found_path, attempted_moves = has_path_recursive(game_board, new_piece, new_position, target, move, attempted_moves)
             if has_found_path:
-                return True
+                return True, attempted_moves
                 
-    return has_found_path
+    return has_found_path, attempted_moves
+
+def get_move(piece, position):
+    x, y = position
+    return (x, y, piece)
 
 def get_opposite(move):
     if move == Move.LEFT:
