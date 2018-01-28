@@ -110,7 +110,8 @@ def test():
     forward_test()
     activation_derivative_with_respect_to_bias_test()
     activation_derivative_with_respect_to_weight_test()
-
+    error_derivative_with_respect_to_output_test()
+    
 def forward_test():
     evaluator = new_evaluator(2, 2)
     inputs = [1, 2]
@@ -136,6 +137,14 @@ def activation_derivative_with_respect_to_weight_test():
     biases = [-7, 8]
     expected_output = [0, 2]
     result = evaluator.activation_derivative_with_respect_to_weight(inputs, weights, biases)
+    print("dfdw returns expected output:", np.array_equal(result, expected_output))
+
+def error_derivative_with_respect_to_output_test():
+    evaluator = new_evaluator(2, 2)
+    computed_results = [1, 2, 3]
+    desired_results = [4, 5, 6]
+    expected_output = [3, 3, 3]
+    result = evaluator.error_derivative_with_respect_to_output(computed_results, desired_results)
     print("dfdw returns expected output:", np.array_equal(result, expected_output))
 
 test()
