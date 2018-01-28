@@ -1,11 +1,15 @@
-import engine
 import command_line_output
-import sys
+import engine
+import evaluator
+
+from copy import deepcopy
 from random import randint
-# scaffold for what it should look like
 board_width = 10
 board_height = 20
+
 def choose_move(game, piece):
+    command_line_output.print_game("choosing move for:", game)
+    command_line_output.print_piece(piece)
     rotations = [0, 1, 2, 3]
     search_tree = []
     for y_coordinate, row in enumerate(game):
@@ -15,27 +19,22 @@ def choose_move(game, piece):
                 candidate = x_coordinate, y_coordinate, rotated_piece
                 if(engine.move_is_legal(game, candidate)):
                     search_tree.append(candidate)
-    # for position on board:
-    #    if engine.is_legal_move(board, piece, position):
-    #        search_tree.add(position)
-    # best_move = null
-    # best_value = 0
-    # for move in search_tree:
-    #   resultant_board = board.apply(move)
-    #   value = evaluate(resultant_board)
-    #   if best_value < value:
-    #       best_value = value
-    #       best_move = move
+    best_move = None
+    best_value = 0
+    for move in search_tree:
+        x, y, piece = move
+        resultant_board = engine.join_matrices(game, piece, (x, y))
+        value = evaluator.evaluate(resultant_board)
+        if best_value < value:
+            best_value = value
+            best_move = move
+
     print("search_tree size = ", len(search_tree))
     if(len(search_tree) == 0):
         return None, None
     best_move = search_tree[randint(0, len(search_tree) - 1)]
     value = 15
     return best_move, value
-
-# def evaluate(board):
-#   cnn_input = board.flatten
-#   cnn.evaluate(cnn_input)
 
 def main():
     iteration = 1
@@ -53,17 +52,14 @@ def main():
             if(move == None):
                 game_over = True
                 continue
-            # historical_evaluations.push((move, value))
             print("move = ", move)
             points_gained, game, piece = engine.play(move, game)
             points += points_gained
             if points_gained > 0:
                 print("gained " + str(points_gained) + " point[s]!")
-      #      sys.exit()
             input("hit enter for next move...")
-      #      sys.exit()
             move_number += 1
-        # cnn.train(game.score, historical_evaluations)
+        evaluator.train(game.score)
         iteration += 1
 
 main() 

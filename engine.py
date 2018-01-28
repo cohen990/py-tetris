@@ -2,6 +2,9 @@
 #-*- coding: utf-8 -*-
 
 import pathfinder
+import command_line_output as clo
+
+from copy import deepcopy
 from random import randrange as rand
 
 tetris_shapes = [
@@ -59,11 +62,12 @@ def remove_row(board, row):
 
 
 def join_matrices(game_board, piece, position): 
+    new_game_board = deepcopy(game_board)
     position_x, position_y = position 
     for y, row in enumerate(piece): 
         for x, val in enumerate(row): 
-            game_board[y+position_y-1][x+position_x] += val 
-    return game_board
+            new_game_board[y+position_y-1][x+position_x] += val 
+    return new_game_board
 
 def remove_rows(board):
     cleared_rows = 0
