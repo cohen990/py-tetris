@@ -43,12 +43,13 @@ class Evaluator(object):
             return 0
         return activatee + bias
 
-    def activation_derivative_with_respect_to_bias(self, inputs, weights, bias):
+    def activation_derivative_with_respect_to_bias(self, inputs, weights, biases):
         activations = np.add(np.dot(inputs, weights),  np.transpose(biases))
-        return np.max(np.divide(activations, np.absolute(activations)), 0)
+        return np.maximum(np.divide(activations, np.absolute(activations)), 0)
 
     def activation_derivative_with_respect_to_weight(self, inputs, weights, biases):
-        return np.max(np.add(np.dot(inputs, weights),  np.transpose(biases)), 0)
+        activations = np.add(np.dot(inputs, weights),  np.transpose(biases))
+        return np.maximum(np.multiply(np.divide(activations, np.absolute(activations)), inputs), 0)
 
     def save_selected_evaluation(self, board, value):
         self.current_iteration_evaluations.append((board, value))
@@ -106,10 +107,35 @@ def new_evaluator(input_size, hidden_size):
     return Evaluator(input_size, hidden_size)
 
 def test():
-    evaluator = new_evaluator(2, 2)
-    print(evaluator)
+    forward_test()
+    activation_derivative_with_respect_to_bias_test()
+    activation_derivative_with_respect_to_weight_test()
 
-    result = evaluator.forward([1, 1], [[1, 1], [1, 1]], [1, 1])
-    print("forward given all ones, returns all threes", result)
+def forward_test():
+    evaluator = new_evaluator(2, 2)
+    inputs = [1, 2]
+    input_to_hidden = [[3, 4], [5, 6]]
+    hidden_biases = [7, 8]
+    expected_output = [20, 24]
+    result = evaluator.forward(inputs, input_to_hidden, hidden_biases)
+    print("forward given known input, returns expected output:", np.array_equal(result, expected_output))
+
+def activation_derivative_with_respect_to_bias_test():
+    evaluator = new_evaluator(2, 2)
+    inputs = [1, 2]
+    weights = [[-3, 4], [5, -6]]
+    biases = [7, -8]
+    expected_output = [1, 0]
+    result = evaluator.activation_derivative_with_respect_to_bias(inputs, weights, biases)
+    print("dfdb returns expected output:", np.array_equal(result, expected_output))
+
+def activation_derivative_with_respect_to_weight_test():
+    evaluator = new_evaluator(2, 2)
+    inputs = [1, 2]
+    weights = [[-3, 4], [-5, 6]]
+    biases = [-7, 8]
+    expected_output = [0, 2]
+    result = evaluator.activation_derivative_with_respect_to_weight(inputs, weights, biases)
+    print("dfdw returns expected output:", np.array_equal(result, expected_output))
 
 test()
