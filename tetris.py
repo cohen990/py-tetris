@@ -1,6 +1,3 @@
-#!/usr/bin/env python2
-#-*- coding: utf-8 -*-
-
 from random import randrange as rand
 import sys
 import engine
