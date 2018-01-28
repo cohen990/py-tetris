@@ -29,11 +29,7 @@ def choose_move(game, piece):
             best_value = value
             best_move = move
 
-    if(len(search_tree) == 0):
-        return None, None
-    best_move = search_tree[randint(0, len(search_tree) - 1)]
-    value = 15
-    return best_move, value
+    return best_move, best_value
 
 def main():
     iteration = 1
@@ -48,11 +44,12 @@ def main():
             print("MOVE NUMBER ", move_number)
             clo.print_game("game", game)
             move, value = choose_move(game, piece)
-            print("Evaluated at " + str(value) + " points!")
             if(move == None):
                 game_over = True
                 continue
+            print("Evaluated at " + str(value) + " points!")
             rows_cleared, game, piece = engine.play(move, game)
+            evaluator.save_selected_evaluation(game, value)
             points += rows_cleared ** 2
             if rows_cleared > 0:
                 print("gained " + str(points_gained) + " point[s]!")
