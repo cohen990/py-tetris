@@ -51,7 +51,8 @@ def main():
             print("Evaluated at " + str(value) + " points!")
             rows_cleared, game, piece = engine.play(move, game)
             evaluator.save_selected_evaluation(game, value)
-            points += rows_cleared ** 2
+            points_gained = rows_cleared ** 2
+            points += points_gained
             if rows_cleared > 0:
                 print("gained " + str(points_gained) + " point[s]!")
             #input("hit enter for next move...")

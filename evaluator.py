@@ -30,6 +30,8 @@ class Evaluator(object):
         error = self.error_function(evaluations, final_score)
         self.input_to_hidden = self.back_propagate(final_score, evaluations, inputs[0], self.input_to_hidden, self.hidden_biases)
         self.hidden_to_output = self.back_propagate(final_score, evaluations, hidden_activations, self.hidden_to_output, self.output_bias)
+        self.hidden_biases = self.back_propagate_biases(final_score, evaluations, hidden_activations, self.input_to_hidden, self.hidden_biases)
+        self.output_bias = self.back_propagate_biases(final_score, evaluations, evaluations, self.hidden_to_output, self.output_bias)
         print("error = ", error)
         return
 
@@ -58,8 +60,6 @@ class Evaluator(object):
         self.current_iteration_evaluations.append((board, value))
 
     def error_function(self, results, desired_result):
-        print("results = ", results)
-        print("desired results = ", desired_result)
         error = (1.0/(2*len(results)))*np.sum(np.subtract(results, desired_result)**2)
         return error
 
@@ -71,17 +71,19 @@ class Evaluator(object):
         dydw = self.activation_derivative_with_respect_to_weight(activations, weights, biases)
         return np.multiply(dedy, dydw)
 
-    def error_derivative_with_respect_to_biases(self, activation, intended_result):
+    def error_derivative_with_respect_to_biases(self, desired_result, computed_result, activations, weights, biases):
         dedy = self.error_derivative_with_respect_to_output(computed_result, desired_result) 
         dydb = self.activation_derivative_with_respect_to_bias(activations, weights, biases)
-        return np.multiply(dedy, dydw)
+        return np.multiply(dedy, dydb)
 
     def back_propagate(self, desired_result, computed_result, activations, weights, biases):
-        print("old weights", weights)
         dedw = self.error_derivative_with_respect_to_weights(desired_result, computed_result, activations, weights, biases)
         result = weights - np.transpose(np.multiply(self.training_rate, dedw))
-        print("new weights", weights)
         return result
+
+    def back_propagate_biases(self, desired_result, computed_result, activations, weights, biases):
+        dedb = self.error_derivative_with_respect_to_biases(activations, computed_result, desired_result, weights, biases)
+        result = biases - np.transpose(np.multiply(self.training_rate, dedb))
 
 def initialize_weights(dimension_1, dimension_2):
     return np.random.randn(dimension_1, dimension_2)
@@ -109,6 +111,7 @@ def test():
     activation_derivative_with_respect_to_weight_test()
     error_derivative_with_respect_to_output_test()
     error_derivative_with_respect_to_weights_test()
+    error_derivative_with_respect_to_biases_test()
 
 def forward_test():
     evaluator = new_evaluator(2, 2)
@@ -155,5 +158,16 @@ def error_derivative_with_respect_to_weights_test():
     expected_output = [[0, 0], [6, 12]]
     result = evaluator.error_derivative_with_respect_to_weights(desired_result, computed_result, activations, weights, biases)
     print("dedw returns expected output:", np.array_equal(result, expected_output))
+
+def error_derivative_with_respect_to_biases_test():
+    evaluator = new_evaluator(2, 2)
+    activations = [1, 2]
+    weights = [[-3, 4], [-5, 6]]
+    biases = [-7, 8]
+    desired_result = [9]
+    computed_result = [15]
+    expected_output = [0, 6]
+    result = evaluator.error_derivative_with_respect_to_biases(desired_result, computed_result, activations, weights, biases)
+    print("dedb returns expected output:", np.array_equal(result, expected_output))
 
 test()
