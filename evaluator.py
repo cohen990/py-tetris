@@ -48,8 +48,11 @@ class Evaluator(object):
         return np.maximum(np.divide(activations, np.absolute(activations)), 0)
 
     def activation_derivative_with_respect_to_weight(self, inputs, weights, biases):
-        activations = np.add(np.dot(inputs, weights),  np.transpose(biases))
-        return np.maximum(np.multiply(np.divide(activations, np.absolute(activations)), inputs), 0)
+        dotted = np.dot(inputs, weights)
+        activations = np.add(dotted,  np.transpose(biases))
+        rectified = np.clip(activations, 0, 1)
+        result = np.outer(rectified, inputs)
+        return result
 
     def save_selected_evaluation(self, board, value):
         self.current_iteration_evaluations.append((board, value))
@@ -65,9 +68,7 @@ class Evaluator(object):
 
     def error_derivative_with_respect_to_weights(self, desired_result, computed_result, activations, weights, biases):
         dedy = self.error_derivative_with_respect_to_output(computed_result, desired_result) 
-        print("dedy = ", dedy)
         dydw = self.activation_derivative_with_respect_to_weight(activations, weights, biases)
-        print("dydw = ", dydw)
         return np.multiply(dedy, dydw)
 
     def error_derivative_with_respect_to_biases(self, activation, intended_result):
@@ -76,21 +77,17 @@ class Evaluator(object):
         return np.multiply(dedy, dydw)
 
     def back_propagate(self, desired_result, computed_result, activations, weights, biases):
-        print("======back propping=======")
-        print("activations: ", activations)
-        print("original_weights: ", weights)
+        print("old weights", weights)
         dedw = self.error_derivative_with_respect_to_weights(desired_result, computed_result, activations, weights, biases)
-        print("dedw = ", dedw)
-        result = weights - np.multiply(self.training_rate, dedw) 
-        print("new weights: ", result)
-        #sys.exit()
+        result = weights - np.transpose(np.multiply(self.training_rate, dedw))
+        print("new weights", weights)
         return result
 
 def initialize_weights(dimension_1, dimension_2):
-    return np.random.rand(dimension_1, dimension_2)
+    return np.random.randn(dimension_1, dimension_2)
 
 def initialize_biases(size):
-    return np.random.rand(size,1)
+    return np.random.randn(size,1)
 
 def get_inputs_from_board(board_state):
     cleaned = board_state[:-1]
@@ -111,7 +108,8 @@ def test():
     activation_derivative_with_respect_to_bias_test()
     activation_derivative_with_respect_to_weight_test()
     error_derivative_with_respect_to_output_test()
-    
+    error_derivative_with_respect_to_weights_test()
+
 def forward_test():
     evaluator = new_evaluator(2, 2)
     inputs = [1, 2]
@@ -135,7 +133,7 @@ def activation_derivative_with_respect_to_weight_test():
     inputs = [1, 2]
     weights = [[-3, 4], [-5, 6]]
     biases = [-7, 8]
-    expected_output = [0, 2]
+    expected_output = [[0, 0], [1, 2]]
     result = evaluator.activation_derivative_with_respect_to_weight(inputs, weights, biases)
     print("dfdw returns expected output:", np.array_equal(result, expected_output))
 
@@ -143,8 +141,19 @@ def error_derivative_with_respect_to_output_test():
     evaluator = new_evaluator(2, 2)
     computed_results = [1, 2, 3]
     desired_results = [4, 5, 6]
-    expected_output = [3, 3, 3]
+    expected_output = -3
     result = evaluator.error_derivative_with_respect_to_output(computed_results, desired_results)
-    print("dfdw returns expected output:", np.array_equal(result, expected_output))
+    print("dedy returns expected output:", np.array_equal(result, expected_output))
+
+def error_derivative_with_respect_to_weights_test():
+    evaluator = new_evaluator(2, 2)
+    activations = [1, 2]
+    weights = [[-3, 4], [-5, 6]]
+    biases = [-7, 8]
+    desired_result = [9]
+    computed_result = [15]
+    expected_output = [[0, 0], [6, 12]]
+    result = evaluator.error_derivative_with_respect_to_weights(desired_result, computed_result, activations, weights, biases)
+    print("dedw returns expected output:", np.array_equal(result, expected_output))
 
 test()
