@@ -20,12 +20,12 @@ def choose_move(game, piece):
                 if(engine.move_is_legal(game, candidate)):
                     search_tree.append(candidate)
     best_move = None
-    best_value = 0
+    best_value = None
     for move in search_tree:
         x, y, piece = move
         resultant_board = engine.join_matrices(game, piece, (x, y))
         value = evaluator.evaluate(resultant_board)
-        if best_value < value:
+        if best_value == None or best_value < value:
             best_value = value
             best_move = move
 
@@ -45,6 +45,7 @@ def main():
             clo.print_game("game", game)
             move, value = choose_move(game, piece)
             if(move == None):
+                print("game over")
                 game_over = True
                 continue
             print("Evaluated at " + str(value) + " points!")
