@@ -1,15 +1,15 @@
-import command_line_output
+import command_line_output as clo
 import engine
-import evaluator
+import evaluator as ev
 
 from copy import deepcopy
 from random import randint
 board_width = 10
 board_height = 20
 
+evaluator = ev.new_evaluator(board_width * board_height, 50)
+
 def choose_move(game, piece):
-    command_line_output.print_game("choosing move for:", game)
-    command_line_output.print_piece(piece)
     rotations = [0, 1, 2, 3]
     search_tree = []
     for y_coordinate, row in enumerate(game):
@@ -29,7 +29,6 @@ def choose_move(game, piece):
             best_value = value
             best_move = move
 
-    print("search_tree size = ", len(search_tree))
     if(len(search_tree) == 0):
         return None, None
     best_move = search_tree[randint(0, len(search_tree) - 1)]
@@ -43,23 +42,24 @@ def main():
         move_number = 1
         game, piece = engine.new_game(board_width, board_height)
         game_over = False
+        points = 0
         while(not game_over):
             points = 0
             print("MOVE NUMBER ", move_number)
-            command_line_output.print_piece(piece)
-            command_line_output.print_game("game", game)
+            clo.print_game("game", game)
             move, value = choose_move(game, piece)
+            print("Evaluated at " + str(value) + " points!")
             if(move == None):
                 game_over = True
                 continue
-            print("move = ", move)
-            points_gained, game, piece = engine.play(move, game)
-            points += points_gained
-            if points_gained > 0:
+            rows_cleared, game, piece = engine.play(move, game)
+            points += rows_cleared ** 2
+            if rows_cleared > 0:
                 print("gained " + str(points_gained) + " point[s]!")
-            input("hit enter for next move...")
+            #input("hit enter for next move...")
             move_number += 1
-        evaluator.train(game.score)
+        print("Total score: ", points)
+        evaluator.train(points)
         iteration += 1
 
 main() 
