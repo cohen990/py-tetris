@@ -41,7 +41,6 @@ def main():
         game_over = False
         points = 0
         while(not game_over):
-            points = 0
             log.write("MOVE NUMBER ", move_number)
             log.write_game("game", game)
             move, value = choose_move(game, piece)
@@ -54,8 +53,9 @@ def main():
             evaluator.save_selected_evaluation(game, value)
             points_gained = rows_cleared ** 2
             points += points_gained
-            if rows_cleared > 0:
+            if points_gained > 0:
                 log.write("gained " + str(points_gained) + " point[s]!")
+                log.write("total points: ", points)
             #input("hit enter for next move...")
             move_number += 1
         log.write("Total score: ", points)
