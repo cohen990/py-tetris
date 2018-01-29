@@ -48,7 +48,7 @@ def main():
                 log.write("game over")
                 game_over = True
                 continue
-            log.write("Evaluated at " + str(value) + " points!")
+            log.write("Evaluated at " + str(value) + " fitness")
             rows_cleared, game, piece = engine.play(move, game)
             evaluator.save_selected_evaluation(game, value)
             points_gained = rows_cleared ** 2
@@ -58,7 +58,7 @@ def main():
             log.write("total points: ", points)
             move_number += 1
         log.write("Total score: ", points)
-        evaluator.train(points)
+        evaluator.train(points*100 + move_number)
         iteration += 1
 
 main() 
