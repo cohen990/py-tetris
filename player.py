@@ -1,9 +1,9 @@
-import command_line_output as clo
+import hybrid_output as log
 import engine
 import evaluator as ev
 
 from copy import deepcopy
-from random import randint
+import random 
 board_width = 10
 board_height = 20
 
@@ -19,45 +19,46 @@ def choose_move(game, piece):
                 candidate = x_coordinate, y_coordinate, rotated_piece
                 if(engine.move_is_legal(game, candidate)):
                     search_tree.append(candidate)
-    best_move = None
-    best_value = None
+    if len(search_tree) == 0:
+        return None, None
+
+    values = []
     for move in search_tree:
         x, y, piece = move
         resultant_board = engine.join_matrices(game, piece, (x, y))
         value = evaluator.evaluate(resultant_board)
-        if best_value == None or best_value < value:
-            best_value = value
-            best_move = move
-
-    return best_move, best_value
+        values.append(value)
+    max_value = max(values)
+    move_valuations = list(filter(lambda move_value: move_value[1] == max_value, list(zip(search_tree, values))))
+    return random.choice(move_valuations)
 
 def main():
     iteration = 1
     while(True):
-        print("Iteration ", iteration)
+        log.write("Iteration ", iteration)
         move_number = 1
         game, piece = engine.new_game(board_width, board_height)
         game_over = False
         points = 0
         while(not game_over):
             points = 0
-            print("MOVE NUMBER ", move_number)
-            clo.print_game("game", game)
+            log.write("MOVE NUMBER ", move_number)
+            log.write_game("game", game)
             move, value = choose_move(game, piece)
             if(move == None):
-                print("game over")
+                log.write("game over")
                 game_over = True
                 continue
-            print("Evaluated at " + str(value) + " points!")
+            log.write("Evaluated at " + str(value) + " points!")
             rows_cleared, game, piece = engine.play(move, game)
             evaluator.save_selected_evaluation(game, value)
             points_gained = rows_cleared ** 2
             points += points_gained
             if rows_cleared > 0:
-                print("gained " + str(points_gained) + " point[s]!")
+                log.write("gained " + str(points_gained) + " point[s]!")
             #input("hit enter for next move...")
             move_number += 1
-        print("Total score: ", points)
+        log.write("Total score: ", points)
         evaluator.train(points)
         iteration += 1
 
