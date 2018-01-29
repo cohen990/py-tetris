@@ -14,7 +14,7 @@ class Evaluator(object):
         self.hidden_biases = initialize_biases(hidden_size)
         self.output_bias = initialize_biases(1)
         self.current_iteration_evaluations = []
-        self.training_rate = 0.01
+        self.training_rate = 0.0001
 
     def evaluate(self, board_state):
         inputs = get_inputs_from_board(board_state)
