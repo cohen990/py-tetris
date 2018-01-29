@@ -55,8 +55,7 @@ def main():
             points += points_gained
             if points_gained > 0:
                 log.write("gained " + str(points_gained) + " point[s]!")
-                log.write("total points: ", points)
-            #input("hit enter for next move...")
+            log.write("total points: ", points)
             move_number += 1
         log.write("Total score: ", points)
         evaluator.train(points)
