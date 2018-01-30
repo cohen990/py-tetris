@@ -1,7 +1,8 @@
 import os
 line = "========================================"
 block = '<>'
-os.remove("out.txt")
+if os.path.isfile("out.txt"):
+    os.remove("out.txt")
 def open_log():
     return open("out.txt", 'a')
 
