@@ -14,14 +14,22 @@ def assert_true(conditional):
 def assert_arrays_equal(array1, array2):
     passed = np.array_equal(array1, array2)
     if not passed:
-        message = ""
-        message += ">>>>The two arrays were not equal\n"
-        message += str(array1)
-        message += "\n"
-        message += str(array2)
-        message += "\n"
-        message += "<<<<"
-        raise AssertionException(message)
+        fail_array_assertion(array1, array2, "equal")
+
+def assert_arrays_close(array1, array2):
+    passed = np.allclose(array1, array2)
+    if not passed:
+        fail_array_assertion(array1, array2, "close")
+
+def fail_array_assertion(array1, array2, descriptor):
+    message = ""
+    message += ">>>>The two arrays were not " + descriptor + "\n"
+    message += str(array1)
+    message += "\n"
+    message += str(array2)
+    message += "\n"
+    message += "<<<<"
+    raise AssertionException(message)
 
 def test(func):
     func.is_test = True
