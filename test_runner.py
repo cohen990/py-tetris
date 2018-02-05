@@ -13,7 +13,7 @@ def run_test(test_name, test_method):
     except AssertionException as error:
         test_passed = False
         test_status = "FAIL"
-        test_status += ": "
+        test_status += "\n"
         test_status += str(error)
     log.write(test_status)
     return test_passed
