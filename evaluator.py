@@ -64,7 +64,7 @@ class Evaluator(object):
         print("activations", activations)
         rectified = np.clip(activations, 0, 1)
         print("rectified", rectified)
-        result = np.transpose(np.outer(inputs, rectified))
+        result = np.outer(inputs, rectified)
         print("result", result)
         return result
 
