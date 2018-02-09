@@ -55,17 +55,10 @@ class Evaluator(object):
         return np.maximum(normalised, 0)
 
     def activation_derivative_with_respect_to_weight(self, inputs, weights, biases):
-        print("inputs", inputs)
-        print("weights", weights)
-        print("biases", biases)
         weighted_inputs = np.transpose(np.dot(inputs, weights))
-        print("weighted_inputs", weighted_inputs)
         activations = np.add(weighted_inputs,  np.transpose(biases))
-        print("activations", activations)
         rectified = np.clip(activations, 0, 1)
-        print("rectified", rectified)
         result = np.outer(inputs, rectified)
-        print("result", result)
         return result
 
     def save_selected_evaluation(self, board, value):
@@ -80,9 +73,7 @@ class Evaluator(object):
 
     def error_derivative_with_respect_to_weights(self, desired_result, computed_result, activations, weights, biases):
         dedy = self.error_derivative_with_respect_to_output(computed_result, desired_result) 
-        print("dedy\n", dedy)
         dydw = self.activation_derivative_with_respect_to_weight(activations, weights, biases)
-        print("dydw\n", dydw)
         return np.multiply(dedy, dydw)
 
     def error_derivative_with_respect_to_biases(self, desired_result, computed_result, activations, weights, biases):
@@ -92,7 +83,6 @@ class Evaluator(object):
 
     def back_propagate_weights(self, weights_to_modify, desired_result, computed_result, activations, weights, biases):
         dedw = self.error_derivative_with_respect_to_weights(desired_result, computed_result, activations, weights, biases)
-        print("dedw\n", dedw)
         result = weights_to_modify - np.transpose(np.multiply(self.training_rate, np.transpose(dedw)))
         return result
 
@@ -225,7 +215,7 @@ def back_propagate_weights_with_multiple_outputs_test():
     biases = np.array([-7, 8])
     desired_result = np.array([1, 9])
     computed_result = np.array([2, 13])
-    expected_result = np.array([[-1, 14], [-11, 3]])
+    expected_result = np.array([[-1, 10], [-7, 3]])
     result = evaluator.back_propagate_weights(weights_to_add_to, desired_result, computed_result, activations, weights, biases)
     assert_arrays_equal(result, expected_result)
 
