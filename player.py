@@ -29,6 +29,9 @@ def choose_move(game, piece):
         value = evaluator.evaluate(resultant_board)
         values.append(value)
     max_value = max(values)
+    if random.random() > 0.9:
+        log.write("Exploring a random option")
+        max_value = random.choice(values)
     move_valuations = list(filter(lambda move_value: move_value[1] == max_value, list(zip(search_tree, values))))
     return random.choice(move_valuations)
 
