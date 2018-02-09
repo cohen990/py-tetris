@@ -23,21 +23,29 @@ class Evaluator(object):
         output = self.forward(hidden, self.hidden_to_output, self.output_bias) 
         return output[0][0]
 
-    def train(self, final_score):
+    def train(self, final_fitness):
         original_input_to_hidden = deepcopy(self.input_to_hidden)
         original_hidden_to_output = deepcopy(self.hidden_to_output)
         original_hidden_biases = deepcopy(self.hidden_biases)
         original_output_bias = deepcopy(self.output_bias)
         for evaluation in self.current_iteration_evaluations:
             inputs = get_inputs_from_board(evaluation[0])
+            log.write_game("Training against game", np.array(inputs).reshape((20, 10)))
             value = evaluation[1]
+            score_so_far = evaluation[2]
+            moves_so_far = evaluation[3]
+            fitness_so_far = self.calculate_fitness(score_so_far, moves_so_far)
+            log.write("Evaluation at the time: " + str(value))
+            log.write("Actual value: " + str(final_fitness))
+            effective_fitness = final_fitness - fitness_so_far
             hidden_activations = self.forward(inputs, self.input_to_hidden, self.hidden_biases)
-            error = self.error_function(value, final_score)
-            self.input_to_hidden = self.back_propagate_weights(self.input_to_hidden, final_score, value, inputs, original_input_to_hidden, self.hidden_biases)
-            self.hidden_to_output = self.back_propagate_weights(self.hidden_to_output, final_score, value, hidden_activations, original_hidden_to_output, self.output_bias)
-            self.hidden_biases = self.back_propagate_biases(self.hidden_biases, final_score, value, inputs, self.input_to_hidden, original_hidden_biases)
-            self.output_bias = self.back_propagate_biases(self.output_bias, final_score, value, hidden_activations, self.hidden_to_output, original_output_bias)
+            error = self.error_function(value, effective_fitness)
+            self.input_to_hidden = self.back_propagate_weights(self.input_to_hidden, effective_fitness, value, inputs, original_input_to_hidden, original_hidden_biases)
+            self.hidden_to_output = self.back_propagate_weights(self.hidden_to_output, final_fitness, value, hidden_activations, original_hidden_to_output, original_output_bias)
+            self.hidden_biases = self.back_propagate_biases(self.hidden_biases, final_fitness, value, inputs, original_input_to_hidden, original_hidden_biases)
+            self.output_bias = self.back_propagate_biases(self.output_bias, final_fitness, value, hidden_activations, original_hidden_to_output, original_output_bias)
         log.write("error = ", error)
+        self.current_iteration_evaluations = []
 
     def forward(self, inputs, weights, biases):
         activate = np.vectorize(self.activation)
@@ -45,9 +53,10 @@ class Evaluator(object):
         return(activate(activations, np.transpose(biases)))
 
     def activation(self, activatee, bias):
-        if activatee + bias <= 0:
-            return 0
-        return activatee + bias
+        raw_activation = activatee + bias
+        if raw_activation <= 0:
+            return 0.1 * raw_activation
+        return raw_activation
 
     def activation_derivative_with_respect_to_bias(self, inputs, weights, biases):
         activations = np.add(np.dot(inputs, weights),  np.transpose(biases))
@@ -61,8 +70,8 @@ class Evaluator(object):
         result = np.outer(inputs, rectified)
         return result
 
-    def save_selected_evaluation(self, board, value):
-        self.current_iteration_evaluations.append((board, value))
+    def save_selected_evaluation(self, board, value, moves_so_far, score_so_far):
+        self.current_iteration_evaluations.append((board, value, moves_so_far, score_so_far))
 
     def error_function(self, results, desired_result):
         error = 0.5*np.sum(np.subtract(results, desired_result)**2)
@@ -90,6 +99,9 @@ class Evaluator(object):
         dedb = self.error_derivative_with_respect_to_biases(desired_result, computed_result, activations, weights, biases)
         result = biases_to_modify - np.transpose(np.multiply(self.training_rate, dedb))
         return result
+
+    def calculate_fitness(self, score, moves):
+        return score * 1000 + moves
 
 def initialize_weights(dimension_1, dimension_2):
     return np.random.randn(dimension_1, dimension_2)
@@ -231,3 +243,16 @@ def back_propagate_biases_test():
     expected_output = np.array([1, 0.1])
     result = evaluator.back_propagate_biases(biases_to_add_to, desired_result, computed_result, activations, weights, biases)
     assert_arrays_close(result, expected_output)
+
+def train_test():
+    evaluator = new_evaluator(2, 2, 0.1)
+    evaluator.input_to_hidden = np.array([[-0.9, -1.1], [-0.7, 0.1]])
+    evaluator.hidden_to_output = np.array([[-0.6], [0.8]])
+    evaluator.hidden_biases = np.array([[0.8], [0.6]])
+    evaluator.output_bias = np.array([[1.1]])
+    first_inputs = [0, 1]
+    first_evaluation = 1.6
+    first_actual_fitness = 30
+    second_inputs = [1, 0]
+    second_evaluation = 5
+    second_actual_fitness = 60
