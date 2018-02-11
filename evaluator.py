@@ -30,13 +30,13 @@ class Evaluator(object):
         original_output_bias = deepcopy(self.output_bias)
         for evaluation in self.current_iteration_evaluations:
             inputs = get_inputs_from_board(evaluation[0])
-            log.write_game("Training against game", np.array(inputs).reshape((20, 10)))
+            log.debug(log.game_to_log_message("Training against game", np.array(inputs).reshape((20, 10))))
             value = evaluation[1]
             score_so_far = evaluation[2]
             moves_so_far = evaluation[3]
             fitness_so_far = self.calculate_fitness(score_so_far, moves_so_far)
-            log.write("Evaluation at the time: " + str(value))
-            log.write("Actual value: " + str(final_fitness))
+            log.debug("Evaluation at the time: " + str(value))
+            log.debug("Actual value: " + str(final_fitness))
             effective_fitness = final_fitness - fitness_so_far
             hidden_activations = self.forward(inputs, self.input_to_hidden, self.hidden_biases)
             error = self.error_function(value, effective_fitness)
@@ -44,7 +44,7 @@ class Evaluator(object):
             self.hidden_to_output = self.back_propagate_weights(self.hidden_to_output, final_fitness, value, hidden_activations, original_hidden_to_output, original_output_bias)
             self.hidden_biases = self.back_propagate_biases(self.hidden_biases, final_fitness, value, inputs, original_input_to_hidden, original_hidden_biases)
             self.output_bias = self.back_propagate_biases(self.output_bias, final_fitness, value, hidden_activations, original_hidden_to_output, original_output_bias)
-        log.write("error = ", error, False)
+        log.out("error = ", error)
         self.current_iteration_evaluations = []
 
     def forward(self, inputs, weights, biases):
