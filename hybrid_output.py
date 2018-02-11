@@ -13,38 +13,26 @@ def open_log():
 output = open_log()
 debug_output = open_debug()
 
-def write_game(name, game, debug = True):
+def game_to_log_message(name, game):
     game_as_string = line + '\n'
     for row in game:
         game_as_string += convert_array_to_blocks(row) + '\n'
     game_as_string += line
     message = name + " = \n"
-    log_message = message + game_as_string + "\n"
-    debug_output.write(log_message)
-    if not debug:
-        output.write(log_message)
-    print(message, game_as_string)
-    output.flush()
+    return message + game_as_string + "\n"
 
-def write_piece(piece, debug = True):
-    piece_as_string = ""
-    for row in piece:
-        piece_as_string += remove_square_brackets(convert_array_to_blocks(row)) + '\n'
-    piece_message = "piece = \n"
-    log_message = piece_message + piece_as_string + "\n"
-    debug_output.write(log_message)
-    if not debug:
-        output.write(log_message)
-    print(piece_message + piece_as_string)
-    output.flush()
+def debug(message, target_object = ""):
+    _write(message, target_object, debug_output)
 
-def write(message, target_object = "", debug = True):
+def out(message, target_object = ""):
+    _write(message, target_object, output)
+    _write(message, target_object, debug_output)
+
+def _write(message, target_object, log_file):
     log_message = message + str(target_object) + "\n"
-    debug_output.write(log_message)
-    if not debug:
-        output.write(log_message)
+    log_file.write(log_message)
+    log_file.flush()
     print(message, target_object)
-    output.flush()
 
 def convert_array_to_blocks(array):
     return str(array).replace('0', '  ').replace(',', ' ').replace('1', block)

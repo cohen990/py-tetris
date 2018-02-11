@@ -31,7 +31,7 @@ def choose_move(game, piece):
     max_value = max(values)
     if len(values) > 0:
         if random.random() > 0.9:
-            log.write("Exploring a random option")
+            log.debug("Exploring a random option")
             max_value = random.choice(values)
     move_valuations = list(filter(lambda move_value: move_value[1] == max_value, list(zip(search_tree, values))))
     return random.choice(move_valuations)
@@ -39,7 +39,7 @@ def choose_move(game, piece):
 def main():
     iteration = 1
     while(True):
-        log.write("Iteration ", iteration, False)
+        log.out("Iteration ", iteration)
         move_number = 0
         game, piece = engine.new_game(board_width, board_height)
         game_over = False
@@ -48,22 +48,22 @@ def main():
             move_number += 1
             move, value = choose_move(game, piece)
             if(move == None):
-                log.write("game over", "", False)
+                log.out("game over") 
                 game_over = True
                 continue
-            log.write("MOVE NUMBER ", move_number, False)
-            log.write_game("game", game)
-            log.write("Evaluated at " + str(value) + " fitness", "", False)
+            log.out("MOVE NUMBER ", move_number)
+            log.debug(log.game_to_log_message("game", game))
+            log.out("Evaluated at " + str(value) + " fitness")
             rows_cleared, game, piece = engine.play(move, game)
             points_gained = rows_cleared ** 2
             points += points_gained
             if points_gained > 0:
-                log.write("gained " + str(points_gained) + " point[s]!", "", False)
-            log.write("total points: ", points, False)
+                log.out("gained " + str(points_gained) + " point[s]!")
+            log.out("total points: ", points)
             evaluator.save_selected_evaluation(game, value, points, move_number)
-        log.write("Total score: ", points, False)
+        log.out("Total score: ", points)
         actual_fitness = evaluator.calculate_fitness(points, move_number)
-        log.write("Actual fitness: ", actual_fitness, False)
+        log.out("Actual fitness: ", actual_fitness)
         evaluator.train(actual_fitness)
         iteration += 1
 
