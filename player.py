@@ -46,13 +46,13 @@ def main():
         points = 0
         while(not game_over):
             move_number += 1
-            log.write("MOVE NUMBER ", move_number, False)
-            log.write_game("game", game, False)
             move, value = choose_move(game, piece)
             if(move == None):
                 log.write("game over", "", False)
                 game_over = True
                 continue
+            log.write("MOVE NUMBER ", move_number, False)
+            log.write_game("game", game)
             log.write("Evaluated at " + str(value) + " fitness", "", False)
             rows_cleared, game, piece = engine.play(move, game)
             points_gained = rows_cleared ** 2
