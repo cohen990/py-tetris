@@ -39,31 +39,31 @@ def choose_move(game, piece):
 def main():
     iteration = 1
     while(True):
-        log.write("Iteration ", iteration)
+        log.write("Iteration ", iteration, False)
         move_number = 0
         game, piece = engine.new_game(board_width, board_height)
         game_over = False
         points = 0
         while(not game_over):
             move_number += 1
-            log.write("MOVE NUMBER ", move_number)
-            log.write_game("game", game)
+            log.write("MOVE NUMBER ", move_number, False)
+            log.write_game("game", game, False)
             move, value = choose_move(game, piece)
             if(move == None):
-                log.write("game over")
+                log.write("game over", "", False)
                 game_over = True
                 continue
-            log.write("Evaluated at " + str(value) + " fitness")
+            log.write("Evaluated at " + str(value) + " fitness", "", False)
             rows_cleared, game, piece = engine.play(move, game)
             points_gained = rows_cleared ** 2
             points += points_gained
             if points_gained > 0:
-                log.write("gained " + str(points_gained) + " point[s]!")
-            log.write("total points: ", points)
+                log.write("gained " + str(points_gained) + " point[s]!", "", False)
+            log.write("total points: ", points, False)
             evaluator.save_selected_evaluation(game, value, points, move_number)
-        log.write("Total score: ", points)
+        log.write("Total score: ", points, False)
         actual_fitness = evaluator.calculate_fitness(points, move_number)
-        log.write("Actual fitness: ", actual_fitness)
+        log.write("Actual fitness: ", actual_fitness, False)
         evaluator.train(actual_fitness)
         iteration += 1
 
