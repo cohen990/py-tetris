@@ -55,7 +55,9 @@ class Evaluator(object):
     def activation(self, activatee, bias):
         raw_activation = activatee + bias
         if raw_activation <= 0:
-            return 0.1 * raw_activation
+            return -0.1 * raw_activation
+        if raw_activation <= -1:
+            return -1.0/raw_activation
         return raw_activation
 
     def activation_derivative_with_respect_to_bias(self, inputs, weights, biases):
