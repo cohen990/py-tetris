@@ -44,7 +44,7 @@ class Evaluator(object):
             self.hidden_to_output = self.back_propagate_weights(self.hidden_to_output, final_fitness, value, hidden_activations, original_hidden_to_output, original_output_bias)
             self.hidden_biases = self.back_propagate_biases(self.hidden_biases, final_fitness, value, inputs, original_input_to_hidden, original_hidden_biases)
             self.output_bias = self.back_propagate_biases(self.output_bias, final_fitness, value, hidden_activations, original_hidden_to_output, original_output_bias)
-        log.write("error = ", error)
+        log.write("error = ", error, False)
         self.current_iteration_evaluations = []
 
     def forward(self, inputs, weights, biases):
