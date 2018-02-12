@@ -15,17 +15,27 @@ def main():
     final_scores = list(map(float, compiled.findall(lines)))
     final_scores_moving_average = get_moving_average(final_scores, moving_average_window)
 
-    pyplot.subplot(211)
-    pyplot.plot(errors)
-    pyplot.plot(errors_moving_average)
-    pyplot.xlabel("iteration")
+    left_axes = pyplot.subplot(211)
     pyplot.ylabel("error")
+    errors_plot, = left_axes.plot(errors, label="errors")
+    right_axes = left_axes.twinx()
+    errors_moving_average_plot, = right_axes.plot(errors_moving_average, 'y-', label="moving average")
 
-    pyplot.subplot(212)
-    pyplot.plot(final_scores)
-    pyplot.plot(final_scores_moving_average)
+    left_legend = pyplot.legend(handles=[errors_plot], loc=2)
+    ax = pyplot.gca().add_artist(left_legend)
+    pyplot.legend(handles=[errors_moving_average_plot], loc=1)
+
+    left_axes = pyplot.subplot(212)
     pyplot.xlabel("iteration")
     pyplot.ylabel("fitness")
+    final_scores_plot, = left_axes.plot(final_scores, label="final scores")
+    right_axes = left_axes.twinx()
+    final_scores_moving_average_plot, = right_axes.plot(final_scores_moving_average, 'y-', label="moving average")
+
+    left_legend = pyplot.legend(handles=[final_scores_plot], loc=2)
+    ax = pyplot.gca().add_artist(left_legend)
+    pyplot.legend(handles=[final_scores_moving_average_plot], loc=1)
+
     pyplot.show()
 
 def get_moving_average(data, window):
