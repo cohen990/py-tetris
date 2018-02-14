@@ -5,7 +5,7 @@ def main():
     file = open("out.txt")
     lines = str.join("", file.readlines())
 
-    moving_average_window = 100
+    moving_average_window = 1000
 
     compiled = re.compile("error = (\d+.?\d*)")
     errors = list(map(float, compiled.findall(lines)))
@@ -21,9 +21,9 @@ def main():
     right_axes = left_axes.twinx()
     errors_moving_average_plot, = right_axes.plot(errors_moving_average, 'y-', label="moving average")
 
-    left_legend = pyplot.legend(handles=[errors_plot], loc=2)
-    ax = pyplot.gca().add_artist(left_legend)
-    pyplot.legend(handles=[errors_moving_average_plot], loc=1)
+    left_legend = pyplot.legend(handles=[errors_plot], loc=3)
+    pyplot.gca().add_artist(left_legend)
+    pyplot.legend(handles=[errors_moving_average_plot], loc=4)
 
     left_axes = pyplot.subplot(212)
     pyplot.xlabel("iteration")
@@ -32,9 +32,14 @@ def main():
     right_axes = left_axes.twinx()
     final_scores_moving_average_plot, = right_axes.plot(final_scores_moving_average, 'y-', label="moving average")
 
-    left_legend = pyplot.legend(handles=[final_scores_plot], loc=2)
-    ax = pyplot.gca().add_artist(left_legend)
-    pyplot.legend(handles=[final_scores_moving_average_plot], loc=1)
+    left_legend = pyplot.legend(handles=[final_scores_plot], loc=3)
+    pyplot.gca().add_artist(left_legend)
+    pyplot.legend(handles=[final_scores_moving_average_plot], loc=4)
+
+    pyplot.setp(errors_plot, linewidth=0.2)
+    pyplot.setp(errors_moving_average_plot, linewidth=0.2)
+    pyplot.setp(final_scores_plot, linewidth=0.2)
+    pyplot.setp(final_scores_moving_average_plot, linewidth=0.2)
 
     pyplot.show()
 
