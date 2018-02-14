@@ -106,5 +106,5 @@ venv.bak/
 # vim
 *.swp
 
-out.txt
-debug.txt
+**/out.txt
+**/debug.txt
