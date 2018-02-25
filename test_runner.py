@@ -7,7 +7,7 @@ from test_framework import AssertionException
 def run_test(test_name, test_method):
     test_passed = True
     test_status = "PASS"
-    log.write("> ", test_name)
+    log.out("> ", test_name)
     try:
         test_method()
     except AssertionException as error:
@@ -15,19 +15,19 @@ def run_test(test_name, test_method):
         test_status = "FAIL"
         test_status += "\n"
         test_status += str(error)
-    log.write(test_status)
+    log.out(test_status)
     return test_passed
 
 def output_results(results):
-    log.write("Test run complete. Ran " + str(len(results)) + " tests")
+    log.out("Test run complete. Ran " + str(len(results)) + " tests")
     output_successes(results)
     output_failures(results)
 
 def output_successes(results):
-    log.write(str(get_count_matching(results, True)) + " passed")
+    log.out(str(get_count_matching(results, True)) + " passed")
 
 def output_failures(results):
-    log.write(str(get_count_matching(results, False)) + " failed")
+    log.out(str(get_count_matching(results, False)) + " failed")
 
 def get_count_matching(array, to_match):
     indices = [i for i, x in enumerate(array) if x == to_match]
