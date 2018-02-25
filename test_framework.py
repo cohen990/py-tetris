@@ -1,4 +1,3 @@
-import hybrid_output as log
 import numpy as np
 
 class AssertionException(Exception):

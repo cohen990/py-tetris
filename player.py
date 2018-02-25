@@ -7,7 +7,7 @@ import random
 board_width = 10
 board_height = 20
 
-evaluator = ev.new_evaluator(board_width * board_height, 50)
+evaluator = ev.new_evaluator([board_width * board_height, 50, 1])
 
 def choose_move(game, piece):
     rotations = [0, 1, 2, 3]
@@ -26,7 +26,7 @@ def choose_move(game, piece):
     for move in search_tree:
         x, y, piece = move
         resultant_board = engine.join_matrices(game, piece, (x, y))
-        value = evaluator.evaluate(resultant_board)
+        value = evaluator.evaluate(resultant_board)[0]
         values.append(value)
     max_value = max(values)
     if len(values) > 0:
