@@ -7,7 +7,7 @@ import random
 board_width = 10
 board_height = 20
 
-evaluator = ev.new_evaluator([board_width * board_height, 50, 1])
+evaluator = ev.new_evaluator([board_width * board_height, 50, 20, 1])
 
 def choose_move(game, piece):
     rotations = [0, 1, 2, 3]
