@@ -1,15 +1,20 @@
 import os
+import uuid
+
 line = "========================================"
 block = '<>'
 
-if os.path.isfile("debug.txt"):
-    os.remove("debug.txt")
+output_directory = "out"
+if not os.path.exists(output_directory):
+    os.makedirs(output_directory)
+
+logging_id = str(uuid.uuid4())
+os.makedirs(output_directory + "/" + logging_id)
 def open_debug():
-    return open("debug.txt", 'a')
-if os.path.isfile("out.txt"):
-    os.remove("out.txt")
+    return open(output_directory + "/" + logging_id + "/debug.txt", 'a')
 def open_log():
-    return open("out.txt", 'a')
+    return open(output_directory + "/" + logging_id + "/out.txt", 'a')
+
 output = open_log()
 debug_output = open_debug()
 
@@ -23,16 +28,17 @@ def game_to_log_message(name, game):
 
 def debug(message, target_object = ""):
     _write(message, target_object, debug_output)
+    print(message, target_object)
 
 def out(message, target_object = ""):
     _write(message, target_object, output)
     _write(message, target_object, debug_output)
+    print(message, target_object)
 
 def _write(message, target_object, log_file):
     log_message = message + str(target_object) + "\n"
     log_file.write(log_message)
     log_file.flush()
-    print(message, target_object)
 
 def convert_array_to_blocks(array):
     return str(array).replace('0', '  ').replace(',', ' ').replace('1', block)

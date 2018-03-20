@@ -8,6 +8,7 @@ from copy import deepcopy
 
 class Evaluator(object):
     def __init__(self, network_shape, training_rate):
+        log.out("Generating a network with shape: ", network_shape)
         self.network_shape = network_shape
         self.weights = []
         for index, _ in enumerate(network_shape[:-1]):
@@ -15,7 +16,7 @@ class Evaluator(object):
             self.weights.append(weights)
         self.biases = []
         for index, _ in enumerate(network_shape[:-1]):
-            biases = initialize_biases(network_shape[index+1])[:,0]
+            biases = initialize_biases(network_shape[index + 1])[:,0]
             self.biases.append(biases)
         self.current_iteration_evaluations = []
         self.training_rate = training_rate
@@ -39,13 +40,24 @@ class Evaluator(object):
             effective_fitness = final_fitness - fitness_so_far
             activations = get_inputs_from_board(evaluation[0])
             log.debug(log.game_to_log_message("Training against game", np.array(activations).reshape((20, 10))))
-            for index, _ in enumerate(self.weights):
-                self.weights[index] = self.back_propagate_weights(self.weights[index], effective_fitness, value, activations, original_weights[index], original_biases[index])
-                self.biases[index] = self.back_propagate_biases(self.biases[index], effective_fitness, value, activations, original_weights[index], original_biases[index])
-                activations = self.forward(activations, original_weights[index], original_biases[index])
-            error = self.error_function(value, effective_fitness)
+            error = self.back_propagate(effective_fitness, value, activations, original_weights, original_biases)
+        log.out("Trained against " + str(len(self.current_iteration_evaluations)) + " evaluations")
         log.out("error = ", error)
+        log.debug("Original weights", original_weights)
+        log.debug("New weights", self.weights)
+        log.debug("Original biases", original_biases)
+        log.debug("New biases", self.biases)
         self.current_iteration_evaluations = []
+
+    def back_propagate(self, actual_result, computed_result, activations, original_weights, original_biases):
+        for index, _ in enumerate(self.weights):
+            log.debug("Training weights with shape " + str(self.weights[index].shape))
+            self.weights[index] = self.back_propagate_weights(self.weights[index], actual_result, computed_result, activations, original_weights[index], original_biases[index])
+            log.debug("Training biases with size " + str(self.biases[index].shape))
+            self.biases[index] = self.back_propagate_biases(self.biases[index], actual_result, computed_result, activations, original_weights[index], original_biases[index])
+            activations = self.forward(activations, original_weights[index], original_biases[index])
+        error = self.error_function(computed_result, actual_result)
+        return error
 
     def forward(self, inputs, weights, biases):
         activate = np.vectorize(self.activation)
@@ -106,9 +118,11 @@ class Evaluator(object):
         return score * 1000 + moves
 
 def initialize_weights(dimension_1, dimension_2):
+    log.out("Initializing weights with dimensions: " + str(dimension_1) + ", " + str(dimension_2))
     return np.random.randn(dimension_1, dimension_2)
 
 def initialize_biases(size):
+    log.out("Initializing biases with size: ", size)
     return np.random.randn(size,1)
 
 def get_inputs_from_board(board_state):
@@ -246,15 +260,17 @@ def back_propagate_biases_test():
     result = evaluator.back_propagate_biases(biases_to_add_to, desired_result, computed_result, activations, weights, biases)
     assert_arrays_close(result, expected_output)
 
-def train_test():
-    evaluator = new_evaluator([2, 2], 0.1)
-    evaluator.input_to_hidden = np.array([[-0.9, -1.1], [-0.7, 0.1]])
-    evaluator.hidden_to_output = np.array([[-0.6], [0.8]])
-    evaluator.hidden_biases = np.array([[0.8], [0.6]])
-    evaluator.output_bias = np.array([[1.1]])
-    first_inputs = [0, 1]
-    first_evaluation = 1.6
-    first_actual_fitness = 30
-    second_inputs = [1, 0]
-    second_evaluation = 5
-    second_actual_fitness = 60
+@test
+def back_propagate_test():
+    evaluator = new_evaluator([1, 1, 1, 1], 0.1)
+    activations = np.array([7])
+    actual_result = 8
+    computed_result = 217
+    original_weights = [np.array([[2]]), np.array([[3]]), np.array([[4]])]
+    evaluator.weights = [np.array([[1]]), np.array([[1]]), np.array([[1]])]
+    original_biases = [np.array([3]), np.array([2]), np.array([5])]
+    evaluator.biases = [np.array([1]), np.array([1]), np.array([1])]
+    result = evaluator.back_propagate(actual_result, computed_result, activations, original_weights, original_biases)
+    print(result)
+    print(evaluator.weights)
+    print(evaluator.biases)
