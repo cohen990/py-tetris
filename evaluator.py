@@ -15,7 +15,7 @@ class Evaluator(object):
         self.model.add(Dense(units=64, activation='softplus', input_dim=200))
         self.model.add(Dense(units=1, activation='softplus'))
         self.model.compile(loss='mean_squared_error',
-              optimizer='sgd')
+              optimizer='RMSProp')
         self.current_iteration_evaluations = []
 
     def evaluate(self, board_state):
@@ -36,9 +36,9 @@ class Evaluator(object):
             activations = get_inputs_from_board(evaluation[0])
             x_batch.append(activations)
             y_batch.append(effective_fitness)
-        history = self.model.fit(np.array(x_batch), np.array(y_batch))
+        history = self.model.fit(np.array(x_batch), np.array(y_batch), epochs=10)
         self.current_iteration_evaluations = []
-        log.out("error = ", history.history["loss"][0])
+        log.out("error = ", history.history["loss"][-1])
 
     def calculate_fitness(self, score, moves):
         return score * 10 + moves
