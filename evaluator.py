@@ -12,8 +12,8 @@ class Evaluator(object):
     def __init__(self, network_shape, training_rate):
         log.out("Generating a network with shape: ", network_shape)
         self.model = Sequential()
-        self.model.add(Dense(units=64, activation='selu', input_dim=200))
-        self.model.add(Dense(units=1, activation='selu'))
+        self.model.add(Dense(units=64, activation='softplus', input_dim=200))
+        self.model.add(Dense(units=1, activation='softplus'))
         self.model.compile(loss='mean_squared_error',
               optimizer='sgd')
         self.current_iteration_evaluations = []
@@ -36,8 +36,9 @@ class Evaluator(object):
             activations = get_inputs_from_board(evaluation[0])
             x_batch.append(activations)
             y_batch.append(effective_fitness)
-        self.model.train_on_batch(np.array(x_batch), np.array(y_batch))
+        history = self.model.fit(np.array(x_batch), np.array(y_batch))
         self.current_iteration_evaluations = []
+        log.out("error = ", history.history["loss"][0])
 
     def calculate_fitness(self, score, moves):
         return score * 10 + moves
