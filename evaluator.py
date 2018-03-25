@@ -13,6 +13,8 @@ class Evaluator(object):
         log.out("Generating a network with shape: ", network_shape)
         self.model = Sequential()
         self.model.add(Dense(units=64, activation='softplus', input_dim=200))
+        self.model.add(Dense(units=64, activation='softplus'))
+        self.model.add(Dense(units=32, activation='softplus'))
         self.model.add(Dense(units=1, activation='softplus'))
         self.model.compile(loss='mean_squared_error',
               optimizer='RMSProp')
@@ -39,9 +41,12 @@ class Evaluator(object):
         history = self.model.fit(np.array(x_batch), np.array(y_batch), epochs=10)
         self.current_iteration_evaluations = []
         log.out("error = ", history.history["loss"][-1])
+        self.model.save_weights("weights.hdf5")
+        weights = self.model.get_weights()
+        log.weights(weights)
 
     def calculate_fitness(self, score, moves):
-        return score * 10 + moves
+        return score * 100 + moves
 
     def save_selected_evaluation(self, board, value, moves_so_far, score_so_far):
         self.current_iteration_evaluations.append((board, value, moves_so_far, score_so_far))

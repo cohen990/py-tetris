@@ -1,4 +1,5 @@
 import os
+import numpy
 import uuid
 
 line = "========================================"
@@ -14,6 +15,8 @@ def open_debug():
     return open(output_directory + "/" + logging_id + "/debug.txt", 'a')
 def open_log():
     return open(output_directory + "/" + logging_id + "/out.txt", 'a')
+def open_weights():
+    return open(output_directory + "/" + logging_id + "/weights.txt", 'w')
 
 output = open_log()
 debug_output = open_debug()
@@ -34,6 +37,10 @@ def out(message, target_object = ""):
     _write(message, target_object, output)
     _write(message, target_object, debug_output)
     print(message, target_object)
+
+def weights(weights):
+    numpy.set_printoptions(threshold=numpy.nan)
+    _write("", weights, open_weights())
 
 def _write(message, target_object, log_file):
     log_message = message + str(target_object) + "\n"
