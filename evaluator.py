@@ -46,7 +46,7 @@ class Evaluator(object):
                 activations = get_inputs_from_board(evaluation[0])
                 x_batch.append(activations)
                 y_batch.append(effective_fitness)
-        history = self.model.fit(np.array(x_batch), np.array(y_batch))
+        history = self.model.fit(np.array(x_batch), np.array(y_batch), epochs=10)
         # sample from a rolling history of games
         self.current_episode = []
         log.out("error = ", history.history["loss"][-1])
