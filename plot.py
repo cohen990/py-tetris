@@ -5,7 +5,7 @@ def main():
     file = open("out.txt")
     lines = str.join("", file.readlines())
 
-    moving_average_window = 100
+    moving_average_window = 1000
 
     compiled = re.compile("error = (\d+.?\d*)")
     errors = list(map(float, compiled.findall(lines)))
