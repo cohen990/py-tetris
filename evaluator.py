@@ -20,7 +20,8 @@ class Evaluator(object):
         self.model.add(Dense(units=1, activation='linear'))
         self.model.compile(loss='mean_squared_error',
               optimizer='RMSProp')
-        self.current_iteration_evaluations = []
+        self.current_episode = []
+        self.episodes = []
 
     def evaluate(self, board_state):
         activations = get_inputs_from_board(board_state)
@@ -29,22 +30,26 @@ class Evaluator(object):
         return(prediction)
 
     def train(self, final_fitness):
+        self.episodes.append(self.current_episode)
+        while len(self.episodes) > 100:
+            self.episodes = self.episodes[1:]
+
         x_batch = []
         y_batch = []
-        for evaluation in self.current_iteration_evaluations:
-            value = evaluation[1]
-            score_so_far = evaluation[2]
-            moves_so_far = evaluation[3]
-            fitness_so_far = self.calculate_fitness(score_so_far, moves_so_far)
-            effective_fitness = final_fitness - fitness_so_far
-            activations = get_inputs_from_board(evaluation[0])
-            x_batch.append(activations)
-            y_batch.append(effective_fitness)
+        for episode in self.episodes:
+            for evaluation in episode:
+                value = evaluation[1]
+                score_so_far = evaluation[2]
+                moves_so_far = evaluation[3]
+                fitness_so_far = self.calculate_fitness(score_so_far, moves_so_far)
+                effective_fitness = final_fitness - fitness_so_far
+                activations = get_inputs_from_board(evaluation[0])
+                x_batch.append(activations)
+                y_batch.append(effective_fitness)
         history = self.model.fit(np.array(x_batch), np.array(y_batch))
         # sample from a rolling history of games
-        self.current_iteration_evaluations = []
+        self.current_episode = []
         log.out("error = ", history.history["loss"][-1])
-        self.model.save_weights("weights.hdf5")
         weights = self.model.get_weights()
         log.weights(weights)
 
@@ -52,7 +57,7 @@ class Evaluator(object):
         return score * 100 + moves
 
     def save_selected_evaluation(self, board, value, moves_so_far, score_so_far):
-        self.current_iteration_evaluations.append((board, value, moves_so_far, score_so_far))
+        self.current_episode.append((board, value, moves_so_far, score_so_far))
 
 def get_inputs_from_board(board_state):
     cleaned = board_state[:-1]
