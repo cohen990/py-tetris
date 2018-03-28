@@ -12,10 +12,12 @@ class Evaluator(object):
     def __init__(self, network_shape, training_rate):
         log.out("Generating a network with shape: ", network_shape)
         self.model = Sequential()
-        self.model.add(Dense(units=64, activation='softplus', input_dim=200))
-        self.model.add(Dense(units=64, activation='softplus'))
-        self.model.add(Dense(units=32, activation='softplus'))
-        self.model.add(Dense(units=1, activation='softplus'))
+        self.model.add(Dense(units=64, activation='relu', input_dim=200))
+        self.model.add(Dense(units=64, activation='relu'))
+        self.model.add(Dense(units=64, activation='relu'))
+        self.model.add(Dense(units=64, activation='relu'))
+        self.model.add(Dense(units=64, activation='relu'))
+        self.model.add(Dense(units=1, activation='linear'))
         self.model.compile(loss='mean_squared_error',
               optimizer='RMSProp')
         self.current_iteration_evaluations = []
@@ -38,7 +40,8 @@ class Evaluator(object):
             activations = get_inputs_from_board(evaluation[0])
             x_batch.append(activations)
             y_batch.append(effective_fitness)
-        history = self.model.fit(np.array(x_batch), np.array(y_batch), epochs=10)
+        history = self.model.fit(np.array(x_batch), np.array(y_batch))
+        # sample from a rolling history of games
         self.current_iteration_evaluations = []
         log.out("error = ", history.history["loss"][-1])
         self.model.save_weights("weights.hdf5")
