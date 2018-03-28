@@ -46,18 +46,35 @@ class Evaluator(object):
                 activations = get_inputs_from_board(evaluation[0])
                 x_batch.append(activations)
                 y_batch.append(effective_fitness)
-        history = self.model.fit(np.array(x_batch), np.array(y_batch), epochs=10)
-        # sample from a rolling history of games
-        self.current_episode = []
-        log.out("error = ", history.history["loss"][-1])
+        log.debug("Doing training against " + str(len(x_batch)) + " items.")
+        x_batch = np.array(x_batch)
+        y_batch = np.array(y_batch)
+        x_batch, y_batch = self.unison_shuffled_copies(x_batch, y_batch)
+        train_length = int(len(x_batch) * 0.8)
+        x_train = x_batch[:train_length]
+        y_train = y_batch[:train_length]
+        x_test = x_batch[train_length:]
+        y_test = y_batch[train_length:]
+        epoch_size = int(train_length * 0.35)
+        history = self.model.fit(x_train, y_train, steps_per_epoch=epoch_size, epochs=10)
+        log.out("initial error = ", history.history["loss"][0])
+        log.out("final error = ", history.history["loss"][-1])
+        network_evaluation = self.model.evaluate(x_test, y_test)
+        log.out("evaluation error = ", network_evaluation)
         weights = self.model.get_weights()
         log.weights(weights)
+        self.current_episode = []
 
     def calculate_fitness(self, score, moves):
         return score * 100 + moves
 
     def save_selected_evaluation(self, board, value, moves_so_far, score_so_far):
         self.current_episode.append((board, value, moves_so_far, score_so_far))
+
+    def unison_shuffled_copies(self, a, b):
+        assert len(a) == len(b)
+        p = np.random.permutation(len(a))
+        return a[p], b[p]
 
 def get_inputs_from_board(board_state):
     cleaned = board_state[:-1]
