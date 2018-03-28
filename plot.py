@@ -41,6 +41,7 @@ def main():
     pyplot.setp(final_scores_plot, linewidth=0.2)
     pyplot.setp(final_scores_moving_average_plot, linewidth=0.2)
 
+    pyplot.savefig('plot.png')
     pyplot.show()
 
 def get_moving_average(data, window):
