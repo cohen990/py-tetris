@@ -35,8 +35,8 @@ class Evaluator(object):
         for episode in self.episodes:
             for evaluation in episode:
                 value = evaluation[1]
-                score_so_far = evaluation[2]
-                moves_so_far = evaluation[3]
+                moves_so_far = evaluation[2]
+                score_so_far = evaluation[3]
                 fitness_so_far = self.calculate_fitness(score_so_far, moves_so_far)
                 effective_fitness = final_fitness - fitness_so_far
                 activations = get_inputs_from_board(evaluation[0])
@@ -65,6 +65,8 @@ class Evaluator(object):
         return score * 100 + moves
 
     def save_selected_evaluation(self, board, value, moves_so_far, score_so_far):
+        if(np.array(board).shape != (21, 10)):
+            raise Exception("Attempted to save a board with shape " + str(np.array(board).shape))
         self.current_episode.append((board, value, moves_so_far, score_so_far))
 
     def unison_shuffled_copies(self, a, b):

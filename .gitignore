@@ -109,3 +109,4 @@ venv.bak/
 **/out.txt
 **/debug.txt
 **/weights.txt
+**/plot.png

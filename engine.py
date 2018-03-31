@@ -94,8 +94,7 @@ def rotate_clockwise(shape):
 def play(move, board):
     x, y, piece = move
     board = join_matrices(board, piece, (x, y)) 
-    points, board = remove_rows(board)
-    return points, board, get_new_piece()
+    return board, get_new_piece()
 
 def move_is_legal(game_board, candidate):
     x_coordinate, y_coordinate, piece = candidate
