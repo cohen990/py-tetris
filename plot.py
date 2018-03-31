@@ -2,28 +2,25 @@ import matplotlib.pyplot as pyplot
 import re
 
 def main():
-    file = open("out.txt")
-    lines = str.join("", file.readlines())
-
-    moving_average_window = 1000
-
-    compiled = re.compile("error = (\d+.?\d*)")
-    errors = list(map(float, compiled.findall(lines)))
-    errors_moving_average = get_moving_average(errors, moving_average_window)
-
-    compiled = re.compile("Actual fitness: (\d+)")
-    final_scores = list(map(float, compiled.findall(lines)))
-    final_scores_moving_average = get_moving_average(final_scores, moving_average_window)
+    initial_errors, initial_errors_moving_average = get_data_matching_regex("initial error = (\d+.?\d*)")
+    final_errors, final_errors_moving_average = get_data_matching_regex("final error = (\d+.?\d*)")
+    evaluation_errors, evaluation_errors_moving_average = get_data_matching_regex("evaluation error = (\d+.?\d*)")
+    final_scores, final_scores_moving_average = get_data_matching_regex("Actual fitness: (\d+)")
 
     left_axes = pyplot.subplot(211)
     pyplot.ylabel("error")
-    errors_plot, = left_axes.plot(errors, label="errors")
+    initial_errors_plot, = left_axes.plot(initial_errors, label="errors")
+    final_errors_plot, = left_axes.plot(final_errors, label="errors")
+    evaluation_errors_plot, = left_axes.plot(evaluation_errors, label="errors")
     right_axes = left_axes.twinx()
-    errors_moving_average_plot, = right_axes.plot(errors_moving_average, 'y-', label="moving average")
+    initial_errors_moving_average_plot, = right_axes.plot(initial_errors_moving_average, 'y-', label="moving average")
+    final_errors_moving_average_plot, = right_axes.plot(final_errors_moving_average, 'y-', label="moving average")
+    evaluation_errors_moving_average_plot, = right_axes.plot(evaluation_errors_moving_average, 'y-', label="moving average")
+    right_axes.fill_between(range(len(initial_errors_moving_average)), initial_errors_moving_average, final_errors_moving_average, alpha=0.7)
 
-    left_legend = pyplot.legend(handles=[errors_plot], loc=3)
+    left_legend = pyplot.legend(handles=[final_errors_plot], loc=3)
     pyplot.gca().add_artist(left_legend)
-    pyplot.legend(handles=[errors_moving_average_plot], loc=4)
+    pyplot.legend(handles=[final_errors_moving_average_plot], loc=4)
 
     left_axes = pyplot.subplot(212)
     pyplot.xlabel("iteration")
@@ -36,8 +33,12 @@ def main():
     pyplot.gca().add_artist(left_legend)
     pyplot.legend(handles=[final_scores_moving_average_plot], loc=4)
 
-    pyplot.setp(errors_plot, linewidth=0.2)
-    pyplot.setp(errors_moving_average_plot, linewidth=0.2)
+    pyplot.setp(initial_errors_plot, linewidth=0.2)
+    pyplot.setp(initial_errors_moving_average_plot, linewidth=0.3)
+    pyplot.setp(final_errors_plot, linewidth=0.2)
+    pyplot.setp(final_errors_moving_average_plot, linewidth=0.3)
+    pyplot.setp(evaluation_errors_plot, linewidth=0.3, color="blue", alpha=0.5)
+    pyplot.setp(evaluation_errors_moving_average_plot, linewidth=0.3, color="blue")
     pyplot.setp(final_scores_plot, linewidth=0.2)
     pyplot.setp(final_scores_moving_average_plot, linewidth=0.2)
 
@@ -54,5 +55,15 @@ def get_moving_average(data, window):
             average = sum(window_data) / window
             moving_averages.append(average)
     return moving_averages
+
+def get_data_matching_regex(regex):
+    file = open("out.txt")
+    lines = str.join("", file.readlines())
+
+    compiled = re.compile(regex)
+    data = list(map(float, compiled.findall(lines)))
+    moving_average_window = max(int(len(data)/10), 1)
+    moving_average = get_moving_average(data, moving_average_window)
+    return data, moving_average
 
 main()

@@ -9,13 +9,9 @@ from keras.models import Sequential
 from keras.layers import Dense
 
 class Evaluator(object):
-    def __init__(self, network_shape, training_rate):
-        log.out("Generating a network with shape: ", network_shape)
+    def __init__(self, training_rate):
         self.model = Sequential()
         self.model.add(Dense(units=64, activation='relu', input_dim=200))
-        self.model.add(Dense(units=64, activation='relu'))
-        self.model.add(Dense(units=64, activation='relu'))
-        self.model.add(Dense(units=64, activation='relu'))
         self.model.add(Dense(units=64, activation='relu'))
         self.model.add(Dense(units=1, activation='linear'))
         self.model.compile(loss='mean_squared_error',
@@ -56,7 +52,7 @@ class Evaluator(object):
         x_test = x_batch[train_length:]
         y_test = y_batch[train_length:]
         epoch_size = int(train_length * 0.35)
-        history = self.model.fit(x_train, y_train, steps_per_epoch=epoch_size, epochs=10)
+        history = self.model.fit(x_train, y_train, steps_per_epoch=epoch_size, epochs=2)
         log.out("initial error = ", history.history["loss"][0])
         log.out("final error = ", history.history["loss"][-1])
         network_evaluation = self.model.evaluate(x_test, y_test)
@@ -87,5 +83,5 @@ def get_inputs(board_states):
         result.append(get_inputs_from_board(board_state))
     return result
 
-def new_evaluator(network_shape, learning_rate = 0.0001):
-    return Evaluator(network_shape, learning_rate)
+def new_evaluator(learning_rate = 0.0001):
+    return Evaluator(learning_rate)

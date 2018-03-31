@@ -7,7 +7,7 @@ import random
 board_width = 10
 board_height = 20
 
-evaluator = ev.new_evaluator([board_width * board_height, 50, 20, 1])
+evaluator = ev.new_evaluator()
 
 def choose_move(game, piece):
     rotations = [0, 1, 2, 3]
@@ -48,19 +48,20 @@ def main():
             move_number += 1
             move, value = choose_move(game, piece)
             if(move == None):
-                log.out("game over") 
+                log.debug("game over") 
                 game_over = True
                 continue
-            log.out("MOVE NUMBER ", move_number)
+            log.debug("MOVE NUMBER ", move_number)
             log.debug(log.game_to_log_message("game", game))
-            log.out("Evaluated at " + str(value) + " fitness")
+            log.debug("Evaluated at " + str(value) + " fitness")
             rows_cleared, game, piece = engine.play(move, game)
+            evaluator.save_selected_evaluation(game, value, points, move_number)
             points_gained = rows_cleared ** 2
             points += points_gained
             if points_gained > 0:
-                log.out("gained " + str(points_gained) + " point[s]!")
-            log.out("total points: ", points)
-            evaluator.save_selected_evaluation(game, value, points, move_number)
+                log.debug("gained " + str(points_gained) + " point[s]!")
+            log.debug("total points: ", points)
+        evaluator.save_selected_evaluation(game, value, points, move_number)
         log.out("Total score: ", points)
         actual_fitness = evaluator.calculate_fitness(points, move_number)
         log.out("Actual fitness: ", actual_fitness)
