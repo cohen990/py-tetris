@@ -52,16 +52,17 @@ def main():
                 game_over = True
                 continue
             log.debug("MOVE NUMBER ", move_number)
-            log.debug(log.game_to_log_message("game", game))
             log.debug("Evaluated at " + str(value) + " fitness")
-            rows_cleared, game, piece = engine.play(move, game)
-            evaluator.save_selected_evaluation(game, value, points, move_number)
+            game, piece = engine.play(move, game)
+            log.debug(log.game_to_log_message("game", game))
+            evaluator.save_selected_evaluation(deepcopy(game), value, move_number, points)
+            rows_cleared, game = engine.remove_rows(game)
             points_gained = rows_cleared ** 2
             points += points_gained
             if points_gained > 0:
                 log.debug("gained " + str(points_gained) + " point[s]!")
             log.debug("total points: ", points)
-        evaluator.save_selected_evaluation(game, value, points, move_number)
+        evaluator.save_selected_evaluation(game, value, move_number, points)
         log.out("Total score: ", points)
         actual_fitness = evaluator.calculate_fitness(points, move_number)
         log.out("Actual fitness: ", actual_fitness)
