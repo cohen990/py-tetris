@@ -55,18 +55,18 @@ def main():
             log.debug("Evaluated at " + str(value) + " fitness")
             game, piece = engine.play(move, game)
             log.debug(log.game_to_log_message("game", game))
-            evaluator.save_selected_evaluation(deepcopy(game), value, move_number, points)
+            evaluator.save_selected_evaluation(deepcopy(game), deepcopy(value), deepcopy(move_number), deepcopy(points))
             rows_cleared, game = engine.remove_rows(game)
             points_gained = rows_cleared ** 2
             points += points_gained
             if points_gained > 0:
                 log.debug("gained " + str(points_gained) + " point[s]!")
             log.debug("total points: ", points)
-        evaluator.save_selected_evaluation(game, value, move_number, points)
+        evaluator.save_selected_evaluation(deepcopy(game), deepcopy(value), deepcopy(move_number), deepcopy(points))
         log.out("Total score: ", points)
         actual_fitness = evaluator.calculate_fitness(points, move_number)
         log.out("Actual fitness: ", actual_fitness)
-        evaluator.train(actual_fitness)
+        evaluator.train(deepcopy(actual_fitness))
         iteration += 1
 
 main() 
