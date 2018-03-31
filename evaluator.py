@@ -26,19 +26,20 @@ class Evaluator(object):
         return(prediction)
 
     def train(self, final_fitness):
-        self.episodes.append(self.current_episode)
-        while len(self.episodes) > 100:
+        self.episodes.append((self.current_episode, final_fitness))
+        while len(self.episodes) > 1000:
             self.episodes = self.episodes[1:]
 
         x_batch = []
         y_batch = []
         for episode in self.episodes:
-            for evaluation in episode:
+            episode_fitness = episode[1]
+            for evaluation in episode[0]:
                 value = evaluation[1]
                 moves_so_far = evaluation[2]
                 score_so_far = evaluation[3]
                 fitness_so_far = self.calculate_fitness(score_so_far, moves_so_far)
-                effective_fitness = final_fitness - fitness_so_far
+                effective_fitness = episode_fitness - fitness_so_far
                 activations = get_inputs_from_board(evaluation[0])
                 x_batch.append(activations)
                 y_batch.append(effective_fitness)
@@ -51,8 +52,7 @@ class Evaluator(object):
         y_train = y_batch[:train_length]
         x_test = x_batch[train_length:]
         y_test = y_batch[train_length:]
-        epoch_size = int(train_length * 0.35)
-        history = self.model.fit(x_train, y_train, steps_per_epoch=epoch_size, epochs=2)
+        history = self.model.fit(x_train, y_train, epochs=2)
         log.out("initial error = ", history.history["loss"][0])
         log.out("final error = ", history.history["loss"][-1])
         network_evaluation = self.model.evaluate(x_test, y_test)
