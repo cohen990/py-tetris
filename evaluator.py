@@ -6,15 +6,19 @@ import random
 import sys
 from copy import deepcopy
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Conv2D, Activation, MaxPooling2D, Flatten
 
 class Evaluator(object):
     def __init__(self, training_rate):
         self.model = Sequential()
-        self.model.add(Dense(units=64, activation='relu', input_dim=200))
-        self.model.add(Dense(units=64, activation='relu', input_dim=200))
-        self.model.add(Dense(units=64, activation='relu', input_dim=200))
-        self.model.add(Dense(units=64, activation='relu', input_dim=200))
+        self.model.add(Conv2D(32, 3, input_shape=(20, 10, 1)))
+        self.model.add(Activation('relu'))
+        self.model.add(Conv2D(32, 3))
+        self.model.add(Activation('relu'))
+        self.model.add(MaxPooling2D(pool_size=2))
+
+        self.model.add(Flatten())
+        self.model.add(Dense(units=256, activation='relu'))
         self.model.add(Dense(units=64, activation='relu'))
         self.model.add(Dense(units=1, activation='linear'))
         self.model.compile(loss='mean_squared_error',
@@ -79,7 +83,7 @@ class Evaluator(object):
 
 def get_inputs_from_board(board_state):
     cleaned = board_state[:-1]
-    inputs = np.array(cleaned).flatten()
+    inputs = np.array(cleaned).reshape(20, 10, 1)
     return inputs
 
 def get_inputs(board_states):
