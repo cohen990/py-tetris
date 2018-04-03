@@ -30,7 +30,7 @@ def choose_move(game, piece):
         values.append(value)
     max_value = max(values)
     if len(values) > 0:
-        if random.random() > 0.9:
+        if random.random() > 0.995:
             log.debug("Exploring a random option")
             max_value = random.choice(values)
     move_valuations = list(filter(lambda move_value: move_value[1] == max_value, list(zip(search_tree, values))))
