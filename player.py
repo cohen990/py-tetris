@@ -9,7 +9,7 @@ board_height = 20
 
 evaluator = ev.new_evaluator()
 
-def choose_move(game, piece):
+def choose_move(game, piece, iteration):
     rotations = [0, 1, 2, 3]
     search_tree = []
     for y_coordinate, row in enumerate(game):
@@ -30,7 +30,7 @@ def choose_move(game, piece):
         values.append(value)
     max_value = max(values)
     if len(values) > 0:
-        if random.random() > 0.995:
+        if random.random() > 0.95:
             log.debug("Exploring a random option")
             max_value = random.choice(values)
     move_valuations = list(filter(lambda move_value: move_value[1] == max_value, list(zip(search_tree, values))))
@@ -46,7 +46,7 @@ def main():
         points = 0
         while(not game_over):
             move_number += 1
-            move, value = choose_move(game, piece)
+            move, value = choose_move(game, piece, iteration)
             if(move == None):
                 log.debug("game over") 
                 game_over = True
@@ -62,6 +62,9 @@ def main():
             if points_gained > 0:
                 log.debug("gained " + str(points_gained) + " point[s]!")
             log.debug("total points: ", points)
+            if(move_number >= 150):
+                log.debug("Ending game due to probable loop")
+                game_over = True
         evaluator.save_selected_evaluation(deepcopy(game), deepcopy(value), deepcopy(move_number), deepcopy(points))
         log.out("Total score: ", points)
         actual_fitness = evaluator.calculate_fitness(points, move_number)
