@@ -7,8 +7,6 @@ import random
 
 from training.chapter import Chapter
 
-board_width = 10
-board_height = 20
 
 evaluator = Evaluator()
 
@@ -16,7 +14,7 @@ evaluator = Evaluator()
 def choose_move(game, piece):
     rotations = [0, 1, 2, 3]
     search_tree = []
-    for y_coordinate, row in enumerate(game):
+    for y_coordinate, row in enumerate(game.board):
         for x_coordinate, item in enumerate(row):
             for rotation in rotations:
                 rotated_piece = engine.rotate(piece, rotation)
@@ -29,8 +27,9 @@ def choose_move(game, piece):
     values = []
     for move in search_tree:
         x, y, piece = move
-        resultant_board = engine.join_matrices(game, piece, (x, y))
-        value = evaluator.evaluate(resultant_board)[0]
+        game_copy = deepcopy(game)
+        game_copy.apply_move(piece, (x, y))
+        value = evaluator.evaluate(game_copy)[0]
         values.append(value)
     max_value = max(values)
     if len(values) > 0:
@@ -46,7 +45,7 @@ def main():
     while True:
         log.out("Iteration ", iteration)
         move_number = 0
-        game, piece = engine.new_game(board_width, board_height)
+        game, piece = engine.new_game()
         game_over = False
         points = 0
         while not game_over:
@@ -62,7 +61,7 @@ def main():
             log.debug(log.game_to_log_message("game", game))
             chapter = Chapter(deepcopy(game), deepcopy(move_number), deepcopy(points))
             evaluator.save_selected_evaluation(chapter)
-            rows_cleared, game = engine.remove_rows(game)
+            rows_cleared, game.board = engine.remove_rows(game.board)
             points_gained = rows_cleared ** 2
             points += points_gained
             if points_gained > 0:
@@ -76,7 +75,8 @@ def main():
         log.out("Total score: ", points)
         actual_fitness = chapter.calculate_fitness()
         log.out("Actual fitness: ", actual_fitness)
-        evaluator.train(deepcopy(actual_fitness))
+        evaluator.complete_episode(deepcopy(actual_fitness))
+        evaluator.train()
         iteration += 1
 
 

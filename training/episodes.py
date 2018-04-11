@@ -1,7 +1,5 @@
 import numpy as np
 
-from game import get_inputs_from_board
-
 
 class Episodes:
     def __init__(self):
@@ -16,11 +14,9 @@ class Episodes:
         x_batch = []
         y_batch = []
         for episode in self.episodes:
-            for chapter in episode.chapters:
-                effective_fitness = episode.final_fitness - chapter.calculate_fitness()
-                activations = get_inputs_from_board(chapter.board)
-                x_batch.append(activations)
-                y_batch.append(effective_fitness)
+            flattened_chapters, effective_fitnesses = episode.unroll()
+            x_batch.extend(flattened_chapters)
+            y_batch.extend(effective_fitnesses)
         x_batch = np.array(x_batch)
         y_batch = np.array(y_batch)
         return x_batch, y_batch
