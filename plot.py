@@ -1,7 +1,9 @@
 import matplotlib.pyplot as pyplot
+import matplotlib.animation as animation
 import re
 
-def main():
+figure = pyplot.figure()
+def animate():
     initial_errors, initial_errors_moving_average = get_data_matching_regex("initial error = (\d+.?\d*)")
     final_errors, final_errors_moving_average = get_data_matching_regex("final error = (\d+.?\d*)")
     evaluation_errors, evaluation_errors_moving_average = get_data_matching_regex("evaluation error = (\d+.?\d*)")
@@ -66,4 +68,5 @@ def get_data_matching_regex(regex):
     moving_average = get_moving_average(data, moving_average_window)
     return data, moving_average
 
-main()
+animated_plot = animation.FuncAnimation(figure, animate, interval=1000)
+pyplot.show()
