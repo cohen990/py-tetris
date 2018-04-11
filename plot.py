@@ -3,7 +3,7 @@ import matplotlib.animation as animation
 import re
 
 figure = pyplot.figure()
-def animate():
+def animate(_):
     initial_errors, initial_errors_moving_average = get_data_matching_regex("initial error = (\d+.?\d*)")
     final_errors, final_errors_moving_average = get_data_matching_regex("final error = (\d+.?\d*)")
     evaluation_errors, evaluation_errors_moving_average = get_data_matching_regex("evaluation error = (\d+.?\d*)")
@@ -35,17 +35,18 @@ def animate():
     pyplot.gca().add_artist(left_legend)
     pyplot.legend(handles=[final_scores_moving_average_plot], loc=4)
 
-    pyplot.setp(initial_errors_plot, linewidth=0.2)
-    pyplot.setp(initial_errors_moving_average_plot, linewidth=0.3)
-    pyplot.setp(final_errors_plot, linewidth=0.2)
-    pyplot.setp(final_errors_moving_average_plot, linewidth=0.3)
-    pyplot.setp(evaluation_errors_plot, linewidth=0.3, color="blue", alpha=0.5)
-    pyplot.setp(evaluation_errors_moving_average_plot, linewidth=0.3, color="blue")
-    pyplot.setp(final_scores_plot, linewidth=0.2)
-    pyplot.setp(final_scores_moving_average_plot, linewidth=0.2)
+    pyplot.setp(initial_errors_plot, linewidth=0.2, color="yellow")
+    pyplot.setp(initial_errors_moving_average_plot, linewidth=0.3, color="green")
+    pyplot.setp(final_errors_plot, linewidth=0.2, color="blue")
+    pyplot.setp(final_errors_moving_average_plot, linewidth=0.3, color="purple")
+    pyplot.setp(evaluation_errors_plot, linewidth=0.3, color="red", alpha=0.5) 
+    pyplot.setp(evaluation_errors_moving_average_plot, linewidth=0.3, color="orange")
+    pyplot.setp(final_scores_plot, linewidth=0.2, color="blue")
+    pyplot.setp(final_scores_moving_average_plot, linewidth=0.2, color="orange")
 
     pyplot.savefig('plot.png')
-    pyplot.show()
+    left_axes.plot()
+    left_axes.plot()
 
 def get_moving_average(data, window):
     moving_averages = []
