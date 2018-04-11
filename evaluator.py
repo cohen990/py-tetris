@@ -21,7 +21,7 @@ class Evaluator(object):
         self.model.add(Dense(units=256, activation='relu'))
         self.model.add(Dense(units=64, activation='relu'))
         self.model.add(Dense(units=1, activation='linear'))
-        self.model.compile(loss='mean_squared_error',
+        self.model.compile(loss='mean_squared_logarithmic_error',
               optimizer='RMSProp')
         self.current_episode = []
         self.episodes = []
