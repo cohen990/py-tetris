@@ -2,7 +2,7 @@ import re
 
 
 def prepare_data():
-    errors, errors_moving_average = get_data_matching_regex("error = (\d+.?\d*)")
+    errors, errors_moving_average = get_data_matching_regex("^error = (\d+.?\d*)")
     evaluation_errors, evaluation_errors_moving_average = get_data_matching_regex("evaluation error = (\d+.?\d*)")
     final_scores, final_scores_moving_average = get_data_matching_regex("Actual fitness: (\d+)")
     evaluation_errors, final_scores = \
@@ -28,7 +28,7 @@ def get_data_matching_regex(regex):
     file = open("out.txt")
     lines = str.join("", file.readlines())
 
-    compiled = re.compile(regex)
+    compiled = re.compile(regex, re.MULTILINE)
     data = list(map(float, compiled.findall(lines)))
     moving_average_window = max(int(len(data) / 10), 1)
     moving_average = get_moving_average(data, moving_average_window)
