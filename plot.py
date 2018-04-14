@@ -24,5 +24,6 @@ def animate(_):
     draw_all(bottom_left_axes, bottom_right_axes, top_left_axes, top_right_axes)
 
 
-animated_plot = animation.FuncAnimation(figure, animate, interval=5000)
+seconds = 1000
+animated_plot = animation.FuncAnimation(figure, animate, interval=(60 * seconds))
 pyplot.show()
