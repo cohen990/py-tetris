@@ -76,7 +76,8 @@ def main():
         actual_fitness = chapter.calculate_fitness()
         log.out("Actual fitness: ", actual_fitness)
         evaluator.complete_episode(deepcopy(actual_fitness))
-        evaluator.train()
+        if iteration % 50 == 0:
+            evaluator.train()
         iteration += 1
 
 
