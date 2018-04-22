@@ -5,10 +5,10 @@ def prepare_data():
     errors, errors_moving_average = get_data_matching_regex("^error = (\d+.?\d*)")
     evaluation_errors, evaluation_errors_moving_average = get_data_matching_regex("evaluation error = (\d+.?\d*)")
     final_scores, final_scores_moving_average = get_data_matching_regex("Actual fitness: (\d+)")
-    evaluation_errors, final_scores = \
-        truncate_to_shortest(len(errors), evaluation_errors, final_scores)
-    evaluation_errors_moving_average, final_scores_moving_average = \
-        truncate_to_shortest(len(errors_moving_average), evaluation_errors_moving_average, final_scores_moving_average)
+    evaluation_errors = \
+        truncate_to_shortest(len(errors), evaluation_errors)
+    evaluation_errors_moving_average = \
+        truncate_to_shortest(len(errors_moving_average), evaluation_errors_moving_average)
     return errors, errors_moving_average, evaluation_errors, evaluation_errors_moving_average, final_scores, final_scores_moving_average
 
 
@@ -35,7 +35,5 @@ def get_data_matching_regex(regex):
     return data, moving_average
 
 
-def truncate_to_shortest(length_of_shortest, other, another):
-    other = other[:length_of_shortest]
-    another = another[:length_of_shortest]
-    return other, another
+def truncate_to_shortest(length_of_shortest, other):
+    return other[:length_of_shortest]

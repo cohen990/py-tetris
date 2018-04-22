@@ -1,3 +1,6 @@
+import os
+
+import keras
 import numpy
 from keras import Sequential
 from keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense
@@ -6,10 +9,15 @@ import hybrid_output as log
 from training.data import prepare_training_sets
 
 
+
 class NeuralNetwork:
     def __init__(self):
         self.model = Sequential()
         self.prepare_network()
+
+    def load_weights_if_they_exist(self):
+        if os.path.exists("weights.HDF5"):
+            self.model = keras.models.load_model("weights.HDF5")
 
     def prepare_network(self):
         self.model.add(Conv2D(32, 3, input_shape=(20, 10, 1)))
@@ -23,6 +31,7 @@ class NeuralNetwork:
         self.model.add(Dense(units=1, activation='linear'))
         self.model.compile(loss='mean_squared_logarithmic_error',
                            optimizer='RMSProp')
+        self.load_weights_if_they_exist()
 
     def train(self, episodes):
         x_batch, y_batch = episodes.unroll()
@@ -32,6 +41,7 @@ class NeuralNetwork:
         log.out("error = ", training_result.history["loss"][0])
         network_evaluation = self.model.evaluate(x_test, y_test)
         log.out("evaluation error = ", network_evaluation)
+        self.model.save("weights.HDF5")
 
     def evaluate(self, game):
         activations = game.flatten()
