@@ -7,28 +7,17 @@ import command_line_output as clo
 from copy import deepcopy
 from random import randrange as rand
 
+import tetrominos
 from game import Game
 
 tetris_shapes = [
-        [[1, 1, 1],
-         [0, 1, 0]],
-    
-        [[0, 1, 1],
-        [1, 1, 0]],
-    
-        [[1, 1, 0],
-         [0, 1, 1]],
-    
-        [[1, 0, 0],
-         [1, 1, 1]],
-    
-        [[0, 0, 1],
-         [1, 1, 1]],
-    
-        [[1, 1, 1, 1]],
-    
-        [[1, 1],
-         [1, 1]]
+    tetrominos.T,
+    tetrominos.S,
+    tetrominos.Z,
+    tetrominos.J,
+    tetrominos.L,
+    tetrominos.I,
+    tetrominos.O
 ]
 
 
