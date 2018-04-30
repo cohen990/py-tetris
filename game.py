@@ -19,3 +19,6 @@ class Game:
         for y, row in enumerate(piece):
             for x, val in enumerate(row):
                 self.board[y + position_y - 1][x + position_x] += val
+
+    def board_without_bottom_row(self):
+        return self.board[:-1]
