@@ -186,3 +186,4 @@ tags
 **/weights.txt
 **/plot.png
 examples/
+weights.HDF5
