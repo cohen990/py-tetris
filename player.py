@@ -67,9 +67,6 @@ def main():
             if points_gained > 0:
                 log.debug("gained " + str(points_gained) + " point[s]!")
             log.debug("total points: ", points)
-            if move_number >= 150:
-                log.debug("Ending game due to probable loop")
-                game_over = True
         chapter = Chapter(deepcopy(game), deepcopy(move_number), deepcopy(points))
         evaluator.save_selected_evaluation(chapter)
         log.out("Total score: ", points)
