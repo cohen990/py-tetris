@@ -25,5 +25,5 @@ def animate(_):
 
 
 seconds = 1000
-animated_plot = animation.FuncAnimation(figure, animate, interval=(300 * seconds))
+animated_plot = animation.FuncAnimation(figure, animate, interval=(600 * seconds))
 pyplot.show()
