@@ -14,6 +14,7 @@ class Episode:
         effective_fitnesses = []
         for chapter in self.chapters:
             effective_fitness = self.final_fitness - chapter.calculate_fitness()
+            effective_fitness = chapter.attenuate_fitness(effective_fitness)
             flattened_chapter = chapter.flatten()
             flattened_chapters.append(flattened_chapter)
             effective_fitnesses.append(effective_fitness)

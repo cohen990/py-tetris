@@ -5,7 +5,10 @@ class Chapter:
         self.score = score
 
     def calculate_fitness(self):
-        return float(self.score * 100 + self.number_of_moves)/float(self.calculate_height())
+        return self.score * 100 + self.number_of_moves
+
+    def attenuate_fitness(self, fitness):
+        return float(fitness)/float(self.calculate_height())
 
     def flatten(self):
         return self.game.flatten()
