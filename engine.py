@@ -107,7 +107,7 @@ def piece_has_collided(game_board, piece, position):
                 return True
             if (len(game_board[0]) - 1 < combined_x):
                 return True
-            if (game_board[combined_y][combined_x] + val > 1):
+            if val and game_board[combined_y][combined_x]:
                 return True
     return False
 
@@ -119,7 +119,7 @@ def piece_is_resting(game_board, piece, position):
         for x, val in enumerate(row):
             combined_y = y + position_y - 1
             combined_x = x + position_x
-            if (val == 1 and game_board[combined_y + 1][combined_x] == 1):
+            if val and game_board[combined_y + 1][combined_x]:
                 is_resting = True
     return is_resting
 

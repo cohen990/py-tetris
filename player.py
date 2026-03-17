@@ -1,12 +1,20 @@
+import argparse
+import time
 import hybrid_output as log
 import engine
 from evaluator import Evaluator
 
-from copy import deepcopy
+
 import random
+import numpy as np
 
 from training.chapter import Chapter
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--quiet', action='store_true', help='Suppress game output (keeps epoch/score output)')
+args = parser.parse_args()
+log.quiet = args.quiet
 
 evaluator = Evaluator()
 
@@ -24,13 +32,14 @@ def choose_move(game, piece):
     if len(search_tree) == 0:
         return None, None
 
-    values = []
+    boards = []
     for move in search_tree:
         x, y, piece = move
-        game_copy = deepcopy(game)
+        game_copy = game.copy()
         game_copy.apply_move(piece, (x, y))
-        value = evaluator.evaluate(game_copy)[0]
-        values.append(value)
+        boards.append(game_copy.flatten())
+    boards_batch = np.array(boards)
+    values = evaluator.network.model.predict(boards_batch, verbose=0).flatten().tolist()
     max_value = max(values)
     if len(values) > 0:
         if random.random() > 0.95:
@@ -42,6 +51,7 @@ def choose_move(game, piece):
 
 def main():
     iteration = 1
+    epoch_start = time.time()
     while True:
         log.out("Iteration ", iteration)
         move_number = 0
@@ -58,8 +68,8 @@ def main():
             log.debug("MOVE NUMBER ", move_number)
             log.debug("Evaluated at " + str(value) + " fitness")
             game, piece = engine.play(move, game)
-            log.debug(log.game_to_log_message("game", game))
-            chapter = Chapter(deepcopy(game), deepcopy(move_number), deepcopy(points))
+            log.debug_game("game", game)
+            chapter = Chapter(game.copy(), move_number, points)
             evaluator.save_selected_evaluation(chapter)
             rows_cleared, game.board = engine.remove_rows(game.board)
             points_gained = rows_cleared ** 2
@@ -67,14 +77,17 @@ def main():
             if points_gained > 0:
                 log.debug("gained " + str(points_gained) + " point[s]!")
             log.debug("total points: ", points)
-        chapter = Chapter(deepcopy(game), deepcopy(move_number), deepcopy(points))
+        chapter = Chapter(game.copy(), move_number, points)
         evaluator.save_selected_evaluation(chapter)
         log.out("Total score: ", points)
         actual_fitness = chapter.calculate_fitness()
         log.out("Actual fitness: ", actual_fitness)
-        evaluator.complete_episode(deepcopy(actual_fitness))
+        evaluator.complete_episode(actual_fitness)
         if iteration % 50 == 0:
+            epoch_elapsed = time.time() - epoch_start
+            log.out("Epoch completed in {:.1f}s".format(epoch_elapsed))
             evaluator.train()
+            epoch_start = time.time()
         iteration += 1
 
 

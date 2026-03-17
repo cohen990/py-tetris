@@ -1,9 +1,7 @@
 import os
 import numpy
 import uuid
-
-line = "========================================"
-block = '<>'
+import command_line_output as clo
 
 output_directory = "out"
 if not os.path.exists(output_directory):
@@ -28,19 +26,32 @@ def open_weights():
 output = open_log()
 debug_output = open_debug()
 
+quiet = False
+
 
 def game_to_log_message(name, game):
-    game_as_string = line + '\n'
-    for row in game.board:
-        game_as_string += convert_array_to_blocks(row) + '\n'
-    game_as_string += line
-    message = name + " = \n"
-    return message + game_as_string + "\n"
+    return name + " = \n" + clo.game_to_plain_string(game.board) + "\n"
+
+
+def game_to_colored_message(name, game):
+    rows = game.board[:-1]
+    output = clo.top_border + '\n'
+    for row in rows:
+        output += clo.render_row_colored(row) + '\n'
+    output += clo.bottom_border
+    return name + ':\n' + output
 
 
 def debug(message, target_object=""):
     _write(message, target_object, debug_output)
-    print(message, target_object)
+    if not quiet:
+        print(message, target_object)
+
+
+def debug_game(name, game):
+    _write(game_to_log_message(name, game), "", debug_output)
+    if not quiet:
+        print(game_to_colored_message(name, game))
 
 
 def out(message, target_object=""):
@@ -58,11 +69,3 @@ def _write(message, target_object, log_file):
     log_message = message + str(target_object) + "\n"
     log_file.write(log_message)
     log_file.flush()
-
-
-def convert_array_to_blocks(array):
-    return str(array).replace('0', '  ').replace(',', ' ').replace('1', block)
-
-
-def remove_square_brackets(input_string):
-    return input_string.strip('[]')

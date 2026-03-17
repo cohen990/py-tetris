@@ -7,7 +7,7 @@ class Episodes:
 
     def add(self, episode):
         self.episodes.append(episode)
-        while len(self.episodes) > 1000:
+        while len(self.episodes) > 200:
             self.episodes = self.episodes[1:]
 
     def unroll(self):
