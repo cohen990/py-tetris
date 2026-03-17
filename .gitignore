@@ -187,3 +187,4 @@ tags
 **/plot.png
 examples/
 weights.HDF5
+weights.keras
