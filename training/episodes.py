@@ -7,8 +7,9 @@ class Episodes:
 
     def add(self, episode):
         self.episodes.append(episode)
-        while len(self.episodes) > 200:
-            self.episodes = self.episodes[1:]
+        if len(self.episodes) > 200:
+            self.episodes.sort(key=lambda e: e.final_fitness)
+            self.episodes = self.episodes[len(self.episodes) - 200:]
 
     def unroll(self):
         x_batch = []
