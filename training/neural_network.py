@@ -2,8 +2,7 @@ import os
 
 import keras
 import numpy
-from keras import Sequential
-from keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense
+from keras.layers import Input, Conv2D, Activation, MaxPooling2D, Flatten, Dense, Concatenate
 
 import hybrid_output as log
 from training.data import prepare_training_sets
@@ -12,34 +11,42 @@ from training.data import prepare_training_sets
 
 class NeuralNetwork:
     def __init__(self):
-        self.model = Sequential()
-        self.prepare_network()
+        self.model = self.build_network()
+        self.load_weights_if_they_exist()
 
     def load_weights_if_they_exist(self):
         if os.path.exists("weights.keras"):
             self.model = keras.models.load_model("weights.keras")
 
-    def prepare_network(self):
-        self.model.add(Conv2D(32, 3, input_shape=(20, 10, 1)))
-        self.model.add(Activation('relu'))
-        self.model.add(Conv2D(32, 3))
-        self.model.add(Activation('relu'))
-        self.model.add(MaxPooling2D(pool_size=2))
-        self.model.add(Flatten())
-        self.model.add(Dense(units=256, activation='relu'))
-        self.model.add(Dense(units=64, activation='relu'))
-        self.model.add(Dense(units=1, activation='linear'))
-        self.model.compile(loss='mse',
-                           optimizer='RMSProp')
-        self.load_weights_if_they_exist()
+    def build_network(self):
+        board_input = Input(shape=(20, 10, 1), name='board')
+        context_input = Input(shape=(2,), name='context')
+
+        x = Conv2D(32, 3)(board_input)
+        x = Activation('relu')(x)
+        x = Conv2D(32, 3)(x)
+        x = Activation('relu')(x)
+        x = MaxPooling2D(pool_size=2)(x)
+        x = Flatten()(x)
+
+        x = Concatenate()([x, context_input])
+        x = Dense(units=256, activation='relu')(x)
+        x = Dense(units=64, activation='relu')(x)
+        output = Dense(units=1, activation='softplus')(x)
+
+        model = keras.Model(inputs=[board_input, context_input], outputs=output)
+        model.compile(loss='mean_squared_logarithmic_error', optimizer='RMSProp')
+        return model
 
     def train(self, episodes):
-        x_batch, y_batch = episodes.unroll()
-        log.debug("Doing training against " + str(len(x_batch)) + " items.")
-        x_train, y_train, x_test, y_test = prepare_training_sets(x_batch, y_batch)
-        training_result = self.model.fit(x_train, y_train, epochs=5)
+        boards, contexts, y_batch = episodes.unroll()
+        log.debug("Doing training against " + str(len(boards)) + " items.")
+        x_train_boards, x_train_contexts, y_train, x_test_boards, x_test_contexts, y_test = prepare_training_sets(boards, contexts, y_batch)
+        training_result = self.model.fit(
+            [x_train_boards, x_train_contexts], y_train, epochs=5)
         log.out("error = ", training_result.history["loss"][0])
-        network_evaluation = self.model.evaluate(x_test, y_test)
+        network_evaluation = self.model.evaluate(
+            [x_test_boards, x_test_contexts], y_test)
         log.out("evaluation error = ", network_evaluation)
         self.model.save("weights.keras")
 

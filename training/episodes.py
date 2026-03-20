@@ -12,12 +12,12 @@ class Episodes:
             self.episodes = self.episodes[len(self.episodes) - 200:]
 
     def unroll(self):
-        x_batch = []
-        y_batch = []
+        all_boards = []
+        all_contexts = []
+        all_fitnesses = []
         for episode in self.episodes:
-            flattened_chapters, effective_fitnesses = episode.unroll()
-            x_batch.extend(flattened_chapters)
-            y_batch.extend(effective_fitnesses)
-        x_batch = np.array(x_batch)
-        y_batch = np.array(y_batch)
-        return x_batch, y_batch
+            boards, contexts, fitnesses = episode.unroll()
+            all_boards.extend(boards)
+            all_contexts.extend(contexts)
+            all_fitnesses.extend(fitnesses)
+        return np.array(all_boards), np.array(all_contexts), np.array(all_fitnesses)

@@ -48,3 +48,9 @@ def test_flatten_shape():
     chapter = Chapter(game, number_of_moves=1, score=0)
     flat = chapter.flatten()
     assert flat.shape == (20, 10, 1)
+
+
+def test_context():
+    game = Game()
+    chapter = Chapter(game, number_of_moves=10, score=3)
+    assert chapter.context() == [3, 10]

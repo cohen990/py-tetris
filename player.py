@@ -19,7 +19,7 @@ log.quiet = args.quiet
 evaluator = Evaluator()
 
 
-def choose_move(game, piece):
+def choose_move(game, piece, score, move_number):
     rotations = [0, 1, 2, 3]
     search_tree = []
     for y_coordinate, row in enumerate(game.board):
@@ -39,7 +39,9 @@ def choose_move(game, piece):
         game_copy.apply_move(piece, (x, y))
         boards.append(game_copy.flatten())
     boards_batch = np.array(boards)
-    values = evaluator.network.model.predict(boards_batch, verbose=0).flatten().tolist()
+    contexts_batch = np.array([[score, move_number]] * len(boards))
+    values = evaluator.target_network.model.predict(
+        [boards_batch, contexts_batch], verbose=0).flatten().tolist()
     max_value = max(values)
     if len(values) > 0:
         if random.random() > 0.95:
@@ -60,7 +62,7 @@ def main():
         points = 0
         while not game_over:
             move_number += 1
-            move, value = choose_move(game, piece)
+            move, value = choose_move(game, piece, points, move_number)
             if move is None:
                 log.debug("game over")
                 game_over = True

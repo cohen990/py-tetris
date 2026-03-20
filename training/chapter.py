@@ -13,6 +13,9 @@ class Chapter:
     def flatten(self):
         return self.game.flatten()
 
+    def context(self):
+        return [self.score, self.number_of_moves]
+
     def calculate_height(self):
         for index, row in enumerate(self.game.board_without_bottom_row()):
             if all(column == 0 for column in row):
